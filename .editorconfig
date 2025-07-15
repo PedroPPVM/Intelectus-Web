@@ -1,0 +1,21 @@
+# EditorConfig para projetos Next.js e Tailwind CSS
+
+root = true
+
+[*]
+indent_style = space        # Usa espaços (não tabs)
+indent_size = 2             # 2 espaços por nível de indentação
+charset = utf-8             # Codificação UTF-8
+end_of_line = lf            # Quebra de linha estilo Unix (LF)
+insert_final_newline = true # Sempre adiciona uma linha no final do arquivo
+trim_trailing_whitespace = true  # Remove espaços em branco no final da linha
+
+[*.md]
+trim_trailing_whitespace = false # Permite espaços no final em arquivos markdown (útil para formatação)
+
+[*.{json,jsonc,yml,yaml}]
+indent_size = 2             # Mantém 2 espaços de indentação em arquivos de configuração
+
+[*.{js,jsx,ts,tsx}]
+indent_size = 2             # Para arquivos JS/TS/TSX, 2 espaços
+
