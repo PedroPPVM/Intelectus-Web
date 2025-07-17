@@ -31,7 +31,7 @@ const items = [
   },
   {
     title: 'Desenhos Industriais',
-    url: '/brands',
+    url: '/industrialDesigns',
     icon: PenTool,
   },
   {
