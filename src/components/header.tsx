@@ -9,7 +9,7 @@ const Header = () => {
       <div className="flex h-16 w-full items-center gap-6 px-6">
         <SidebarTrigger />
 
-        <span>Logo</span>
+        <span>Intelectus</span>
 
         <Separator orientation="vertical" className="h-6" />
 

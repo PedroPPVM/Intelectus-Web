@@ -1,4 +1,4 @@
-import { Home, Package } from 'lucide-react';
+import { BookLock, Home, Monitor, PenTool, Store } from 'lucide-react';
 
 import {
   Sidebar,
@@ -13,15 +13,31 @@ import {
 import { CompanyCombobox } from './companyCombobox';
 
 const items = [
+  // TODO: Tela de Dashboards virá futuramente
+  // {
+  //   title: 'Dashboards',
+  //   url: '/',
+  //   icon: Home,
+  // },
   {
-    title: 'Home',
-    url: '/',
-    icon: Home,
+    title: 'Marcas',
+    url: '/brands',
+    icon: Store,
   },
   {
-    title: 'Estoque',
-    url: '/stock',
-    icon: Package,
+    title: 'Patentes',
+    url: '/brands',
+    icon: BookLock,
+  },
+  {
+    title: 'Desenhos Industriais',
+    url: '/brands',
+    icon: PenTool,
+  },
+  {
+    title: 'Programas de Computador',
+    url: '/brands',
+    icon: Monitor,
   },
 ];
 
@@ -30,7 +46,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Omni</SidebarGroupLabel>
+          <SidebarGroupLabel>Intelectus</SidebarGroupLabel>
           <div className="flex pb-2 md:hidden">
             <CompanyCombobox />
           </div>
