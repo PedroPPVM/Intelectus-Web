@@ -36,7 +36,7 @@ const items = [
   },
   {
     title: 'Programas de Computador',
-    url: '/brands',
+    url: '/computerPrograms',
     icon: Monitor,
   },
 ];
