@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -16,12 +18,17 @@ import {
 import { MoreHorizontal } from 'lucide-react';
 import { Patent } from '../page';
 import dayjs from 'dayjs';
+import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
+import { useState } from 'react';
 
 interface PatentsTableProps {
   patents: Patent[];
 }
 
 const PatentsTable = ({ patents }: PatentsTableProps) => {
+  const [isOpenDeleteConfirmModal, setIsOpenDeleteConfirmModal] =
+    useState<boolean>(false);
+
   const actionsOptions = () => {
     return (
       <DropdownMenu>
@@ -33,7 +40,10 @@ const PatentsTable = ({ patents }: PatentsTableProps) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem className="cursor-pointer">Editar</DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => setIsOpenDeleteConfirmModal(true)}
+          >
             Excluir
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -81,6 +91,12 @@ const PatentsTable = ({ patents }: PatentsTableProps) => {
           ))}
         </TableBody>
       </Table>
+
+      <DeleteConfirmModal
+        open={isOpenDeleteConfirmModal}
+        onOpenChange={() => setIsOpenDeleteConfirmModal(false)}
+        onConfirm={() => setIsOpenDeleteConfirmModal(false)}
+      />
     </div>
   );
 };
