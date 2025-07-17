@@ -147,7 +147,7 @@ const Brands = () => {
 
         <div className="flex flex-wrap items-center gap-4">
           <Button>
-            <Plus /> Criar nova marca
+            <Plus /> Criar Marca
           </Button>
         </div>
       </CardHeader>
