@@ -22,8 +22,10 @@ export default function SignIn() {
     <div className="bg-background flex min-h-screen flex-col items-center justify-center gap-4 px-4">
       <Card className="w-[400px]">
         <div className="flex flex-col items-center gap-2">
-          <span className="text-2xl font-bold">Omni Enterprise</span>
-          <span className="text-zinc-400">Sistema de Gestão Empresarial</span>
+          <span className="text-2xl font-bold">Intelectus</span>
+          <span className="text-zinc-400">
+            Sistema de Leitura de Revista do INPI
+          </span>
         </div>
 
         <CardHeader>
