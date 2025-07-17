@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -16,6 +18,8 @@ import {
 import { MoreHorizontal } from 'lucide-react';
 import { IndustrialDesign } from '../page';
 import dayjs from 'dayjs';
+import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
+import { useState } from 'react';
 
 interface IndustrialDesignsTableProps {
   industrialDesigns: IndustrialDesign[];
@@ -24,6 +28,9 @@ interface IndustrialDesignsTableProps {
 const IndustrialDesignsTable = ({
   industrialDesigns,
 }: IndustrialDesignsTableProps) => {
+  const [isOpenDeleteConfirmModal, setIsOpenDeleteConfirmModal] =
+    useState<boolean>(false);
+
   const actionsOptions = () => {
     return (
       <DropdownMenu>
@@ -35,7 +42,10 @@ const IndustrialDesignsTable = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem className="cursor-pointer">Editar</DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => setIsOpenDeleteConfirmModal(true)}
+          >
             Excluir
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -90,6 +100,12 @@ const IndustrialDesignsTable = ({
           ))}
         </TableBody>
       </Table>
+
+      <DeleteConfirmModal
+        open={isOpenDeleteConfirmModal}
+        onOpenChange={() => setIsOpenDeleteConfirmModal(false)}
+        onConfirm={() => setIsOpenDeleteConfirmModal(false)}
+      />
     </div>
   );
 };
