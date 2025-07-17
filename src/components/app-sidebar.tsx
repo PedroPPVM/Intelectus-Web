@@ -26,7 +26,7 @@ const items = [
   },
   {
     title: 'Patentes',
-    url: '/brands',
+    url: '/patents',
     icon: BookLock,
   },
   {
