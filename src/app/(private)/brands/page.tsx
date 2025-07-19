@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
 import BrandsTable from './components/brands-table';
 import { useState } from 'react';
-import { ManageBrandModal } from './components/(manage-brand-modal)/manage-brand-modal';
+import { ManageProcessModal } from '@/components/manage-process-modal';
 
 export interface Brand {
   id: string;
@@ -185,12 +185,20 @@ const Brands = () => {
         </div>
       </CardContent>
 
-      <ManageBrandModal
+      <ManageProcessModal
         open={isOpenBrandModal}
         onOpenChange={() => setIsOpenBrandModal(false)}
         onSave={() => setIsOpenBrandModal(false)}
         mode={manageBrandMode}
-        initialData={selectedBrand}
+        initialData={
+          selectedBrand
+            ? {
+                ...selectedBrand,
+                processNumber: selectedBrand.process,
+                title: selectedBrand.name,
+              }
+            : undefined
+        }
       />
     </Card>
   );

@@ -23,15 +23,17 @@ import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
 
 interface ComputerProgramsTableProps {
   computerPrograms: ComputerProgram[];
+  onOpenComputerProgramModal: (computerProgram: ComputerProgram) => void;
 }
 
 const ComputerProgramsTable = ({
   computerPrograms,
+  onOpenComputerProgramModal,
 }: ComputerProgramsTableProps) => {
   const [isOpenDeleteConfirmModal, setIsOpenDeleteConfirmModal] =
     useState<boolean>(false);
 
-  const actionsOptions = () => {
+  const actionsOptions = (computerProgram: ComputerProgram) => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -41,7 +43,12 @@ const ComputerProgramsTable = ({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem className="cursor-pointer">Editar</DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => onOpenComputerProgramModal(computerProgram)}
+          >
+            Editar
+          </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
             onClick={() => setIsOpenDeleteConfirmModal(true)}
@@ -77,7 +84,7 @@ const ComputerProgramsTable = ({
                 {computerProgram.process}
               </TableCell>
               <TableCell>{computerProgram.title}</TableCell>
-              <TableCell>{computerProgram.shortName}</TableCell>
+              <TableCell>{computerProgram.shortTitle}</TableCell>
               <TableCell>{computerProgram.depositor}</TableCell>
               <TableCell>
                 {computerProgram.cnpj || computerProgram.cpf}
@@ -92,7 +99,9 @@ const ComputerProgramsTable = ({
               <TableCell>
                 {dayjs(computerProgram.validityDate).format('DD/MM/YYYY')}
               </TableCell>
-              <TableCell className="w-[50px]">{actionsOptions()}</TableCell>
+              <TableCell className="w-[50px]">
+                {actionsOptions(computerProgram)}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

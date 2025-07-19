@@ -1,13 +1,17 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
 import ComputerProgramsTable from './components/computer-programs-table';
+import { ManageProcessModal } from '@/components/manage-process-modal';
+import { useState } from 'react';
 
 export interface ComputerProgram {
   id: string;
-  process: number;
+  process: string;
   title: string;
-  shortName: string;
+  shortTitle: string;
   depositor: string;
   cnpj: string;
   cpf: string;
@@ -20,10 +24,10 @@ export interface ComputerProgram {
 const COMPUTER_PROGRAMS_MOCKUP: ComputerProgram[] = [
   {
     id: 'p1a2b3c4',
-    process: 3100001,
+    process: '3100001',
     title:
       'Sistema de Gerenciamento de Clínicas Médicas com Prontuário Eletrônico',
-    shortName: 'ClinMed',
+    shortTitle: 'ClinMed',
     depositor: 'HealthSoft Soluções em Saúde',
     cnpj: '01.234.567/0001-89',
     cpf: '',
@@ -34,9 +38,9 @@ const COMPUTER_PROGRAMS_MOCKUP: ComputerProgram[] = [
   },
   {
     id: 'p2b3c4d5',
-    process: 3100002,
+    process: '3100002',
     title: 'Aplicativo de Controle de Finanças Pessoais com IA',
-    shortName: 'FinSmart',
+    shortTitle: 'FinSmart',
     depositor: 'Fintech Brasil Tecnologia Ltda',
     cnpj: '02.345.678/0001-90',
     cpf: '',
@@ -47,9 +51,9 @@ const COMPUTER_PROGRAMS_MOCKUP: ComputerProgram[] = [
   },
   {
     id: 'p3c4d5e6',
-    process: 3100003,
+    process: '3100003',
     title: 'Plataforma de Ensino Adaptativo com Algoritmo de Reforço',
-    shortName: 'EduAdapt',
+    shortTitle: 'EduAdapt',
     depositor: 'Inova Educação Ltda',
     cnpj: '03.456.789/0001-01',
     cpf: '',
@@ -60,9 +64,9 @@ const COMPUTER_PROGRAMS_MOCKUP: ComputerProgram[] = [
   },
   {
     id: 'p4d5e6f7',
-    process: 3100004,
+    process: '3100004',
     title: 'Sistema de Rastreamento de Frotas com Otimização de Rotas',
-    shortName: 'FleetTrack',
+    shortTitle: 'FleetTrack',
     depositor: 'LogiTech Soluções Logísticas',
     cnpj: '04.567.890/0001-12',
     cpf: '',
@@ -73,9 +77,9 @@ const COMPUTER_PROGRAMS_MOCKUP: ComputerProgram[] = [
   },
   {
     id: 'p5e6f7g8',
-    process: 3100005,
+    process: '3100005',
     title: 'Software para Gestão de Condomínios com Aplicativo Integrado',
-    shortName: 'CondoManager',
+    shortTitle: 'CondoManager',
     depositor: 'SíndicoTech Sistemas',
     cnpj: '05.678.901/0001-23',
     cpf: '',
@@ -86,10 +90,10 @@ const COMPUTER_PROGRAMS_MOCKUP: ComputerProgram[] = [
   },
   {
     id: 'p6f7g8h9',
-    process: 3100006,
+    process: '3100006',
     title:
       'Plataforma de Atendimento Virtual com Processamento de Linguagem Natural',
-    shortName: 'SmartBot',
+    shortTitle: 'SmartBot',
     depositor: 'NeoAtendimento Digital',
     cnpj: '06.789.012/0001-34',
     cpf: '',
@@ -100,9 +104,9 @@ const COMPUTER_PROGRAMS_MOCKUP: ComputerProgram[] = [
   },
   {
     id: 'p7g8h9i0',
-    process: 3100007,
+    process: '3100007',
     title: 'Aplicativo de Monitoramento de Saúde Mental com Diário Emocional',
-    shortName: 'MindTrack',
+    shortTitle: 'MindTrack',
     depositor: 'VivaBem Digital Ltda',
     cnpj: '07.890.123/0001-45',
     cpf: '',
@@ -113,9 +117,9 @@ const COMPUTER_PROGRAMS_MOCKUP: ComputerProgram[] = [
   },
   {
     id: 'p8h9i0j1',
-    process: 3100008,
+    process: '3100008',
     title: 'Sistema de Automação Residencial com Assistente de Voz Local',
-    shortName: 'HomeVoice',
+    shortTitle: 'HomeVoice',
     depositor: 'Casa Inteligente S/A',
     cnpj: '08.901.234/0001-56',
     cpf: '',
@@ -126,9 +130,9 @@ const COMPUTER_PROGRAMS_MOCKUP: ComputerProgram[] = [
   },
   {
     id: 'p9i0j1k2',
-    process: 3100009,
+    process: '3100009',
     title: 'Plataforma Web para Gestão de Cursos Online e Certificação',
-    shortName: 'CertEdu',
+    shortTitle: 'CertEdu',
     depositor: 'Plataforma Saber Ltda',
     cnpj: '09.012.345/0001-67',
     cpf: '',
@@ -139,9 +143,9 @@ const COMPUTER_PROGRAMS_MOCKUP: ComputerProgram[] = [
   },
   {
     id: 'p0j1k2l3',
-    process: 3100010,
+    process: '3100010',
     title: 'Aplicativo de Previsão de Demanda para Pequenos Negócios',
-    shortName: 'PreviVenda',
+    shortTitle: 'PreviVenda',
     depositor: 'Larissa Almeida',
     cnpj: '',
     cpf: '456.789.123-00',
@@ -153,13 +157,33 @@ const COMPUTER_PROGRAMS_MOCKUP: ComputerProgram[] = [
 ];
 
 const ComputerPrograms = () => {
+  const [isOpenProcessModal, setIsOpenProcessModal] = useState(false);
+  const [manageProcessMode, setManageProcessMode] = useState<'create' | 'edit'>(
+    'create',
+  );
+  const [selectedProcess, setSelectedProcess] = useState<
+    ComputerProgram | undefined
+  >(undefined);
+
+  const handleOpenProcessModal = (process: ComputerProgram) => {
+    setManageProcessMode('edit');
+    setIsOpenProcessModal(true);
+    setSelectedProcess(process);
+  };
+
   return (
     <Card className="flex size-full flex-col">
       <CardHeader className="flex flex-wrap items-center justify-between">
         <span className="text-2xl font-bold">Programas de Computador</span>
 
         <div className="flex flex-wrap items-center gap-4">
-          <Button>
+          <Button
+            onClick={() => {
+              setManageProcessMode('create');
+              setIsOpenProcessModal(true);
+              setSelectedProcess(undefined);
+            }}
+          >
             <Plus /> Criar Programa de Computador
           </Button>
         </div>
@@ -167,9 +191,27 @@ const ComputerPrograms = () => {
 
       <CardContent>
         <div className="hidden md:block">
-          <ComputerProgramsTable computerPrograms={COMPUTER_PROGRAMS_MOCKUP} />
+          <ComputerProgramsTable
+            computerPrograms={COMPUTER_PROGRAMS_MOCKUP}
+            onOpenComputerProgramModal={handleOpenProcessModal}
+          />
         </div>
       </CardContent>
+
+      <ManageProcessModal
+        open={isOpenProcessModal}
+        onOpenChange={() => setIsOpenProcessModal(false)}
+        onSave={() => setIsOpenProcessModal(false)}
+        mode={manageProcessMode}
+        initialData={
+          selectedProcess
+            ? {
+                ...selectedProcess,
+                processNumber: selectedProcess.process,
+              }
+            : undefined
+        }
+      />
     </Card>
   );
 };
