@@ -23,13 +23,14 @@ import { useState } from 'react';
 
 interface BrandsTableProps {
   brands: Brand[];
+  onOpenBrandModal: (brand: Brand) => void;
 }
 
-const BrandsTable = ({ brands }: BrandsTableProps) => {
+const BrandsTable = ({ brands, onOpenBrandModal }: BrandsTableProps) => {
   const [isOpenDeleteConfirmModal, setIsOpenDeleteConfirmModal] =
     useState<boolean>(false);
 
-  const actionsOptions = () => {
+  const actionsOptions = (brand: Brand) => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -39,7 +40,12 @@ const BrandsTable = ({ brands }: BrandsTableProps) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem className="cursor-pointer">Editar</DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => onOpenBrandModal(brand)}
+            className="cursor-pointer"
+          >
+            Editar
+          </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setIsOpenDeleteConfirmModal(true)}
             className="cursor-pointer"
@@ -84,7 +90,9 @@ const BrandsTable = ({ brands }: BrandsTableProps) => {
               <TableCell>
                 {dayjs(brand.validityDate).format('DD/MM/YYYY')}
               </TableCell>
-              <TableCell className="w-[50px]">{actionsOptions()}</TableCell>
+              <TableCell className="w-[50px]">
+                {actionsOptions(brand)}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
