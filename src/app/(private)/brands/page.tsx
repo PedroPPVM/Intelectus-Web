@@ -1,11 +1,15 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
 import BrandsTable from './components/brands-table';
+import { useState } from 'react';
+import { ManageBrandModal } from './components/(manage-brand-modal)/manage-brand-modal';
 
 export interface Brand {
   id: string;
-  process: number;
+  process: string;
   name: string;
   depositor: string;
   cnpj: string;
@@ -19,7 +23,7 @@ export interface Brand {
 const BRANDS_MOCKUP: Brand[] = [
   {
     id: '1a2b3c4d',
-    process: 1029384,
+    process: '1029384',
     name: 'Marca Solar',
     depositor: 'Energia Verde Ltda',
     cnpj: '12.345.678/0001-90',
@@ -31,7 +35,7 @@ const BRANDS_MOCKUP: Brand[] = [
   },
   {
     id: '2b3c4d5e',
-    process: 2938475,
+    process: '2938475',
     name: 'TechNova',
     depositor: 'Ana Paula Dias',
     cnpj: '',
@@ -43,7 +47,7 @@ const BRANDS_MOCKUP: Brand[] = [
   },
   {
     id: '3c4d5e6f',
-    process: 3847561,
+    process: '3847561',
     name: 'BioLeve',
     depositor: 'Laboratório BioVida S/A',
     cnpj: '98.765.432/0001-55',
@@ -55,7 +59,7 @@ const BRANDS_MOCKUP: Brand[] = [
   },
   {
     id: '4d5e6f7g',
-    process: 4839201,
+    process: '4839201',
     name: 'Café do Vale',
     depositor: 'Juliano Batista',
     cnpj: '',
@@ -67,7 +71,7 @@ const BRANDS_MOCKUP: Brand[] = [
   },
   {
     id: '5e6f7g8h',
-    process: 5728390,
+    process: '5728390',
     name: 'MaxFit',
     depositor: 'MaxFit Suplementos EIRELI',
     cnpj: '56.789.123/0001-22',
@@ -79,7 +83,7 @@ const BRANDS_MOCKUP: Brand[] = [
   },
   {
     id: '6f7g8h9i',
-    process: 6192837,
+    process: '6192837',
     name: 'NaturaLimp',
     depositor: 'Maria Clara Silva',
     cnpj: '',
@@ -91,7 +95,7 @@ const BRANDS_MOCKUP: Brand[] = [
   },
   {
     id: '7g8h9i0j',
-    process: 7092837,
+    process: '7092837',
     name: 'EcoPack',
     depositor: 'Eco Embalagens Sustentáveis Ltda',
     cnpj: '33.221.100/0001-66',
@@ -103,7 +107,7 @@ const BRANDS_MOCKUP: Brand[] = [
   },
   {
     id: '8h9i0j1k',
-    process: 8029381,
+    process: '8029381',
     name: 'Vita+',
     depositor: 'Farmavida Produtos Naturais',
     cnpj: '77.888.999/0001-44',
@@ -115,7 +119,7 @@ const BRANDS_MOCKUP: Brand[] = [
   },
   {
     id: '9i0j1k2l',
-    process: 9128374,
+    process: '9128374',
     name: 'AutoPro',
     depositor: 'José Henrique Ramos',
     cnpj: '',
@@ -127,7 +131,7 @@ const BRANDS_MOCKUP: Brand[] = [
   },
   {
     id: '0j1k2l3m',
-    process: 1019283,
+    process: '1019283',
     name: 'Doceria da Vó',
     depositor: 'Doces & Delícias Ltda',
     cnpj: '11.222.333/0001-77',
@@ -140,13 +144,33 @@ const BRANDS_MOCKUP: Brand[] = [
 ];
 
 const Brands = () => {
+  const [manageBrandMode, setManageBrandMode] = useState<'create' | 'edit'>(
+    'create',
+  );
+  const [isOpenBrandModal, setIsOpenBrandModal] = useState<boolean>(false);
+  const [selectedBrand, setSelectedBrand] = useState<Brand | undefined>(
+    undefined,
+  );
+
+  const handleOpenBrandModal = (brand: Brand) => {
+    setManageBrandMode('edit');
+    setIsOpenBrandModal(true);
+    setSelectedBrand(brand);
+  };
+
   return (
     <Card className="flex size-full flex-col">
       <CardHeader className="flex flex-wrap items-center justify-between">
         <span className="text-2xl font-bold">Marcas</span>
 
         <div className="flex flex-wrap items-center gap-4">
-          <Button>
+          <Button
+            onClick={() => {
+              setManageBrandMode('create');
+              setSelectedBrand(undefined);
+              setIsOpenBrandModal(true);
+            }}
+          >
             <Plus /> Criar Marca
           </Button>
         </div>
@@ -154,9 +178,20 @@ const Brands = () => {
 
       <CardContent>
         <div className="hidden md:block">
-          <BrandsTable brands={BRANDS_MOCKUP} />
+          <BrandsTable
+            brands={BRANDS_MOCKUP}
+            onOpenBrandModal={handleOpenBrandModal}
+          />
         </div>
       </CardContent>
+
+      <ManageBrandModal
+        open={isOpenBrandModal}
+        onOpenChange={() => setIsOpenBrandModal(false)}
+        onSave={() => setIsOpenBrandModal(false)}
+        mode={manageBrandMode}
+        initialData={selectedBrand}
+      />
     </Card>
   );
 };
