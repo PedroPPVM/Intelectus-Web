@@ -12,13 +12,24 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Brand } from '../../page';
-import { DatePickerField } from './components/date-picker-field';
+import { DatePickerField } from './date-picker-field';
 import dayjs from 'dayjs';
 
-const brandSchema = z.object({
-  process: z.string().min(1, 'Informe um número de processo válido.'),
-  name: z.string().min(1, 'Informe o nome da marca.'),
+interface Process {
+  processNumber: string;
+  title: string;
+  depositor: string;
+  cnpj: string;
+  cpf: string;
+  attorney: string;
+  depositDate: Date;
+  concessionDate: Date;
+  validityDate: Date;
+}
+
+const processSchema = z.object({
+  processNumber: z.string().min(1, 'Informe um número de processo válido.'),
+  title: z.string().min(1, 'Informe o nome da marca.'),
   depositor: z.string().min(1, 'Informe o depositante.'),
   cnpj: z.string().optional(),
   cpf: z.string().optional(),
@@ -28,9 +39,9 @@ const brandSchema = z.object({
   validityDate: z.string().min(1, 'Informe a vigência.'),
 });
 
-type BrandFormSchema = {
-  process: string;
-  name: string;
+type ProcessFormSchema = {
+  processNumber: string;
+  title: string;
   depositor: string;
   cnpj?: string;
   cpf?: string;
@@ -40,21 +51,21 @@ type BrandFormSchema = {
   validityDate: string;
 };
 
-interface ManageBrandModalProps {
+interface ManageProcessModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  initialData?: Brand;
-  onSave: (data: Omit<Brand, 'id'>) => void;
+  initialData?: Process;
+  onSave: (data: Process) => void;
   mode?: 'create' | 'edit';
 }
 
-export function ManageBrandModal({
+export function ManageProcessModal({
   open,
   onOpenChange,
   initialData,
   onSave,
   mode = 'create',
-}: ManageBrandModalProps) {
+}: ManageProcessModalProps) {
   const [depositDateOpen, setDepositDateOpen] = useState(false);
   const [concessionDateOpen, setConcessionDateOpen] = useState(false);
   const [validityDateOpen, setValidityDateOpen] = useState(false);
@@ -66,11 +77,11 @@ export function ManageBrandModal({
     reset,
     formState: { errors },
     watch,
-  } = useForm<BrandFormSchema>({
-    resolver: zodResolver(brandSchema),
+  } = useForm<ProcessFormSchema>({
+    resolver: zodResolver(processSchema),
     defaultValues: {
-      process: initialData?.process ?? '',
-      name: initialData?.name ?? '',
+      processNumber: initialData?.processNumber ?? '',
+      title: initialData?.title ?? '',
       depositor: initialData?.depositor ?? '',
       cnpj: initialData?.cnpj ?? '',
       cpf: initialData?.cpf ?? '',
@@ -90,8 +101,8 @@ export function ManageBrandModal({
   useEffect(() => {
     if (open) {
       reset({
-        process: initialData?.process ?? '',
-        name: initialData?.name ?? '',
+        processNumber: initialData?.processNumber ?? '',
+        title: initialData?.title ?? '',
         depositor: initialData?.depositor ?? '',
         cnpj: initialData?.cnpj ?? '',
         cpf: initialData?.cpf ?? '',
@@ -109,10 +120,10 @@ export function ManageBrandModal({
     }
   }, [open]);
 
-  function onSubmit(data: BrandFormSchema) {
+  function onSubmit(data: ProcessFormSchema) {
     onSave({
-      process: data.process,
-      name: data.name,
+      processNumber: data.processNumber,
+      title: data.title,
       depositor: data.depositor,
       cnpj: data.cnpj || '',
       cpf: data.cpf || '',
@@ -130,12 +141,12 @@ export function ManageBrandModal({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <DialogHeader>
             <DialogTitle>
-              {mode === 'edit' ? 'Editar Marca' : 'Criar Marca'}
+              {mode === 'edit' ? 'Editar Processo' : 'Criar Processo'}
             </DialogTitle>
             <DialogDescription>
               {mode === 'edit'
-                ? 'Edite os dados da marca.'
-                : 'Preencha os dados para criar uma nova marca.'}
+                ? 'Edite os dados do processo.'
+                : 'Preencha os dados para criar um novo processo.'}
             </DialogDescription>
           </DialogHeader>
 
@@ -144,19 +155,19 @@ export function ManageBrandModal({
               <label className="mb-1 block text-sm font-medium">
                 N° do Processo
               </label>
-              <Input type="number" {...register('process')} />
-              {errors.process && (
+              <Input type="number" {...register('processNumber')} />
+              {errors.processNumber && (
                 <span className="text-xs text-red-500">
-                  {errors.process.message}
+                  {errors.processNumber.message}
                 </span>
               )}
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">Marca</label>
-              <Input {...register('name')} />
-              {errors.name && (
+              <label className="mb-1 block text-sm font-medium">Título</label>
+              <Input {...register('title')} />
+              {errors.title && (
                 <span className="text-xs text-red-500">
-                  {errors.name.message}
+                  {errors.title.message}
                 </span>
               )}
             </div>
@@ -235,7 +246,7 @@ export function ManageBrandModal({
               Cancelar
             </Button>
             <Button type="submit">
-              {mode === 'edit' ? 'Salvar Alterações' : 'Criar Marca'}
+              {mode === 'edit' ? 'Salvar Alterações' : 'Criar Processo'}
             </Button>
           </DialogFooter>
         </form>
