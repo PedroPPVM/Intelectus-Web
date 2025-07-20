@@ -23,15 +23,17 @@ import { useState } from 'react';
 
 interface IndustrialDesignsTableProps {
   industrialDesigns: IndustrialDesign[];
+  onOpenIndustrialDesignsModal: (industrialDesign: IndustrialDesign) => void;
 }
 
 const IndustrialDesignsTable = ({
   industrialDesigns,
+  onOpenIndustrialDesignsModal,
 }: IndustrialDesignsTableProps) => {
   const [isOpenDeleteConfirmModal, setIsOpenDeleteConfirmModal] =
     useState<boolean>(false);
 
-  const actionsOptions = () => {
+  const actionsOptions = (industrialDesign: IndustrialDesign) => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -41,7 +43,12 @@ const IndustrialDesignsTable = ({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem className="cursor-pointer">Editar</DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => onOpenIndustrialDesignsModal(industrialDesign)}
+          >
+            Editar
+          </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
             onClick={() => setIsOpenDeleteConfirmModal(true)}
@@ -95,7 +102,9 @@ const IndustrialDesignsTable = ({
               <TableCell>
                 {dayjs(industrialDesign.validityDate).format('DD/MM/YYYY')}
               </TableCell>
-              <TableCell className="w-[50px]">{actionsOptions()}</TableCell>
+              <TableCell className="w-[50px]">
+                {actionsOptions(industrialDesign)}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

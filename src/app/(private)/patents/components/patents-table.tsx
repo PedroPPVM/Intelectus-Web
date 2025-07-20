@@ -23,13 +23,14 @@ import { useState } from 'react';
 
 interface PatentsTableProps {
   patents: Patent[];
+  onOpenPatentsModal: (patent: Patent) => void;
 }
 
-const PatentsTable = ({ patents }: PatentsTableProps) => {
+const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
   const [isOpenDeleteConfirmModal, setIsOpenDeleteConfirmModal] =
     useState<boolean>(false);
 
-  const actionsOptions = () => {
+  const actionsOptions = (patent: Patent) => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -39,7 +40,12 @@ const PatentsTable = ({ patents }: PatentsTableProps) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem className="cursor-pointer">Editar</DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => onOpenPatentsModal(patent)}
+          >
+            Editar
+          </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
             onClick={() => setIsOpenDeleteConfirmModal(true)}
@@ -86,7 +92,9 @@ const PatentsTable = ({ patents }: PatentsTableProps) => {
               <TableCell>
                 {dayjs(patent.validityDate).format('DD/MM/YYYY')}
               </TableCell>
-              <TableCell className="w-[50px]">{actionsOptions()}</TableCell>
+              <TableCell className="w-[50px]">
+                {actionsOptions(patent)}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

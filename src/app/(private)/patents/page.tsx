@@ -1,11 +1,15 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
 import PatentsTable from './components/patents-table';
+import { ManageProcessModal } from '@/components/manage-process-modal';
+import { useState } from 'react';
 
 export interface Patent {
   id: string;
-  process: number;
+  process: string;
   title: string;
   shortName: string;
   depositor: string;
@@ -20,7 +24,7 @@ export interface Patent {
 const PATENTS_MOCKUP: Patent[] = [
   {
     id: 'a1b2c3d4',
-    process: 1001001,
+    process: '1001001',
     title: 'Sistema de Recarga Solar para Veículos Elétricos',
     shortName: 'Recarga Solar',
     depositor: 'Energix Soluções Sustentáveis',
@@ -33,7 +37,7 @@ const PATENTS_MOCKUP: Patent[] = [
   },
   {
     id: 'b2c3d4e5',
-    process: 1001002,
+    process: '1001002',
     title: 'Dispositivo Inteligente de Monitoramento Cardíaco',
     shortName: 'CardioSmart',
     depositor: 'HealthTech Brasil Ltda',
@@ -46,7 +50,7 @@ const PATENTS_MOCKUP: Patent[] = [
   },
   {
     id: 'c3d4e5f6',
-    process: 1001003,
+    process: '1001003',
     title: 'Método de Filtragem Avançada de Microplásticos',
     shortName: 'FiltroMP',
     depositor: 'Água Pura Indústria e Comércio',
@@ -59,7 +63,7 @@ const PATENTS_MOCKUP: Patent[] = [
   },
   {
     id: 'd4e5f6g7',
-    process: 1001004,
+    process: '1001004',
     title: 'Sistema Automatizado de Irrigação com Inteligência Artificial',
     shortName: 'IrrigaIA',
     depositor: 'AgroSmart Inovações',
@@ -72,7 +76,7 @@ const PATENTS_MOCKUP: Patent[] = [
   },
   {
     id: 'e5f6g7h8',
-    process: 1001005,
+    process: '1001005',
     title: 'Composto Bioativo para Tratamento de Diabetes Tipo 2',
     shortName: 'DiabeFit',
     depositor: 'Laboratório Vida Nova',
@@ -85,7 +89,7 @@ const PATENTS_MOCKUP: Patent[] = [
   },
   {
     id: 'f6g7h8i9',
-    process: 1001006,
+    process: '1001006',
     title: 'Dispositivo de Segurança para Motocicletas com Rastreamento',
     shortName: 'MotoTrack',
     depositor: 'Segurança Total Ltda',
@@ -98,7 +102,7 @@ const PATENTS_MOCKUP: Patent[] = [
   },
   {
     id: 'g7h8i9j0',
-    process: 1001007,
+    process: '1001007',
     title: 'Sistema de Aproveitamento de Água da Chuva em Residências',
     shortName: 'AquaReuse',
     depositor: 'João Alberto Rocha',
@@ -111,7 +115,7 @@ const PATENTS_MOCKUP: Patent[] = [
   },
   {
     id: 'h8i9j0k1',
-    process: 1001008,
+    process: '1001008',
     title: 'Aplicativo para Gestão de Consumo Energético em Tempo Real',
     shortName: 'EnergyView',
     depositor: 'GreenTech App Solutions',
@@ -124,7 +128,7 @@ const PATENTS_MOCKUP: Patent[] = [
   },
   {
     id: 'i9j0k1l2',
-    process: 1001009,
+    process: '1001009',
     title: 'Sistema de Realidade Aumentada para Ensino Técnico',
     shortName: 'EduAR',
     depositor: 'Inovação e Ensino Ltda',
@@ -137,7 +141,7 @@ const PATENTS_MOCKUP: Patent[] = [
   },
   {
     id: 'j0k1l2m3',
-    process: 1001010,
+    process: '1001010',
     title: 'Equipamento de Geração de Energia Cinética em Academias',
     shortName: 'KinePower',
     depositor: 'Carlos Henrique Silva',
@@ -151,13 +155,33 @@ const PATENTS_MOCKUP: Patent[] = [
 ];
 
 const Patents = () => {
+  const [isOpenProcessModal, setIsOpenProcessModal] = useState(false);
+  const [manageProcessMode, setManageProcessMode] = useState<'create' | 'edit'>(
+    'create',
+  );
+  const [selectedProcess, setSelectedProcess] = useState<Patent | undefined>(
+    undefined,
+  );
+
+  const handleOpenProcessModal = (process: Patent) => {
+    setManageProcessMode('edit');
+    setIsOpenProcessModal(true);
+    setSelectedProcess(process);
+  };
+
   return (
     <Card className="flex size-full flex-col">
       <CardHeader className="flex flex-wrap items-center justify-between">
         <span className="text-2xl font-bold">Patentes</span>
 
         <div className="flex flex-wrap items-center gap-4">
-          <Button>
+          <Button
+            onClick={() => {
+              setManageProcessMode('create');
+              setIsOpenProcessModal(true);
+              setSelectedProcess(undefined);
+            }}
+          >
             <Plus /> Criar Patente
           </Button>
         </div>
@@ -165,9 +189,27 @@ const Patents = () => {
 
       <CardContent>
         <div className="hidden md:block">
-          <PatentsTable patents={PATENTS_MOCKUP} />
+          <PatentsTable
+            patents={PATENTS_MOCKUP}
+            onOpenPatentsModal={handleOpenProcessModal}
+          />
         </div>
       </CardContent>
+
+      <ManageProcessModal
+        open={isOpenProcessModal}
+        onOpenChange={() => setIsOpenProcessModal(false)}
+        onSave={() => setIsOpenProcessModal(false)}
+        mode={manageProcessMode}
+        initialData={
+          selectedProcess
+            ? {
+                ...selectedProcess,
+                processNumber: selectedProcess.process,
+              }
+            : undefined
+        }
+      />
     </Card>
   );
 };

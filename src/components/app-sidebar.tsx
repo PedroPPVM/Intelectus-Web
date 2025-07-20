@@ -1,8 +1,17 @@
-import { BookLock, Home, Monitor, PenTool, Store } from 'lucide-react';
+import {
+  BookLock,
+  ChevronUp,
+  Home,
+  Monitor,
+  PenTool,
+  Store,
+  User2,
+} from 'lucide-react';
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -11,6 +20,12 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { CompanyCombobox } from './companyCombobox';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 
 const items = [
   // TODO: Tela de Dashboards virá futuramente
@@ -44,14 +59,11 @@ const items = [
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarContent>
+      <SidebarContent className="pt-1.5">
         <SidebarGroup>
-          <SidebarGroupLabel>Intelectus</SidebarGroupLabel>
-          <div className="flex pb-2 md:hidden">
-            <CompanyCombobox />
-          </div>
+          <CompanyCombobox />
 
-          <SidebarGroupContent>
+          <SidebarGroupContent className="pt-2">
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
@@ -67,6 +79,34 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild className="cursor-pointer">
+                <SidebarMenuButton>
+                  <User2 /> Username
+                  <ChevronUp className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                align="end"
+                className="flex w-60 flex-col"
+              >
+                <DropdownMenuItem className="cursor-pointer">
+                  <span>Editar Perfil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <a href={'/sign-in'}>
+                    <span>Sair</span>
+                  </a>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
