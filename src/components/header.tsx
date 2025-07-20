@@ -1,4 +1,3 @@
-import { CompanyCombobox } from './companyCombobox';
 import { ModeToggle } from './theme-toggle';
 import { Separator } from './ui/separator';
 import { SidebarTrigger } from './ui/sidebar';
@@ -12,10 +11,6 @@ const Header = () => {
         <span>Intelectus</span>
 
         <Separator orientation="vertical" className="h-6" />
-
-        <div className="hidden md:block">
-          <CompanyCombobox />
-        </div>
 
         <div className="flex w-full items-end justify-end">
           <ModeToggle />

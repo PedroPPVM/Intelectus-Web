@@ -1,11 +1,15 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
 import IndustrialDesignsTable from './components/industrial-designs-table';
+import { ManageProcessModal } from '@/components/manage-process-modal';
+import { useState } from 'react';
 
 export interface IndustrialDesign {
   id: string;
-  process: number;
+  process: string;
   title: string;
   shortName: string;
   depositor: string;
@@ -20,7 +24,7 @@ export interface IndustrialDesign {
 const INDUSTRIAL_DESIGNS_MOCKUP: IndustrialDesign[] = [
   {
     id: 'a1x2b3c4',
-    process: 2002001,
+    process: '2002001',
     title: 'Design de Embalagem para Perfume em Formato Espiral',
     shortName: 'Embalagem Espiral',
     depositor: 'Essencial Cosméticos Ltda',
@@ -33,7 +37,7 @@ const INDUSTRIAL_DESIGNS_MOCKUP: IndustrialDesign[] = [
   },
   {
     id: 'b2y3c4d5',
-    process: 2002002,
+    process: '2002002',
     title: 'Design de Cadeira Ergonômica com Encosto Modular',
     shortName: 'Cadeira Modular',
     depositor: 'Mobilar Móveis Planejados',
@@ -46,7 +50,7 @@ const INDUSTRIAL_DESIGNS_MOCKUP: IndustrialDesign[] = [
   },
   {
     id: 'c3z4d5e6',
-    process: 2002003,
+    process: '2002003',
     title: 'Design de Garrafa Térmica com Tampa Retrátil',
     shortName: 'ThermoRetrátil',
     depositor: 'Isoterm Brasil',
@@ -59,7 +63,7 @@ const INDUSTRIAL_DESIGNS_MOCKUP: IndustrialDesign[] = [
   },
   {
     id: 'd4a5e6f7',
-    process: 2002004,
+    process: '2002004',
     title: 'Design de Fone de Ouvido com Iluminação LED Integrada',
     shortName: 'Fone LED',
     depositor: 'ÁudioWave Tecnologia',
@@ -72,7 +76,7 @@ const INDUSTRIAL_DESIGNS_MOCKUP: IndustrialDesign[] = [
   },
   {
     id: 'e5b6f7g8',
-    process: 2002005,
+    process: '2002005',
     title: 'Design de Embalagem para Bombons em Formato de Flor',
     shortName: 'Flor de Bombom',
     depositor: 'Delícias da Terra Ltda',
@@ -85,7 +89,7 @@ const INDUSTRIAL_DESIGNS_MOCKUP: IndustrialDesign[] = [
   },
   {
     id: 'f6c7g8h9',
-    process: 2002006,
+    process: '2002006',
     title: 'Design de Relógio de Pulso com Visor Flutuante',
     shortName: 'Relógio Flutuante',
     depositor: 'TempoFino Relógios',
@@ -98,7 +102,7 @@ const INDUSTRIAL_DESIGNS_MOCKUP: IndustrialDesign[] = [
   },
   {
     id: 'g7d8h9i0',
-    process: 2002007,
+    process: '2002007',
     title: 'Design de Armário com Sistema de Abertura Oculta',
     shortName: 'Armário Oculto',
     depositor: 'Inova Marcenaria',
@@ -111,7 +115,7 @@ const INDUSTRIAL_DESIGNS_MOCKUP: IndustrialDesign[] = [
   },
   {
     id: 'h8e9i0j1',
-    process: 2002008,
+    process: '2002008',
     title: 'Design de Luminária com Ajuste Magnético de Altura',
     shortName: 'LuzMag',
     depositor: 'Clara Design de Iluminação',
@@ -124,7 +128,7 @@ const INDUSTRIAL_DESIGNS_MOCKUP: IndustrialDesign[] = [
   },
   {
     id: 'i9f0j1k2',
-    process: 2002009,
+    process: '2002009',
     title: 'Design de Copo Dobrável com Sistema de Trava',
     shortName: 'Copo Dobrável',
     depositor: 'EcoMove Produtos Sustentáveis',
@@ -137,7 +141,7 @@ const INDUSTRIAL_DESIGNS_MOCKUP: IndustrialDesign[] = [
   },
   {
     id: 'j0g1k2l3',
-    process: 2002010,
+    process: '2002010',
     title: 'Design de Embalagem de Sabonete com Textura Natural',
     shortName: 'Sabonete Raiz',
     depositor: 'Luciana Meireles',
@@ -151,13 +155,33 @@ const INDUSTRIAL_DESIGNS_MOCKUP: IndustrialDesign[] = [
 ];
 
 const IndustrialDesigns = () => {
+  const [isOpenProcessModal, setIsOpenProcessModal] = useState(false);
+  const [manageProcessMode, setManageProcessMode] = useState<'create' | 'edit'>(
+    'create',
+  );
+  const [selectedProcess, setSelectedProcess] = useState<
+    IndustrialDesign | undefined
+  >(undefined);
+
+  const handleOpenProcessModal = (process: IndustrialDesign) => {
+    setManageProcessMode('edit');
+    setIsOpenProcessModal(true);
+    setSelectedProcess(process);
+  };
+
   return (
     <Card className="flex size-full flex-col">
       <CardHeader className="flex flex-wrap items-center justify-between">
         <span className="text-2xl font-bold">Desenhos Industriais</span>
 
         <div className="flex flex-wrap items-center gap-4">
-          <Button>
+          <Button
+            onClick={() => {
+              setManageProcessMode('create');
+              setIsOpenProcessModal(true);
+              setSelectedProcess(undefined);
+            }}
+          >
             <Plus /> Criar Desenho Industrial
           </Button>
         </div>
@@ -167,9 +191,25 @@ const IndustrialDesigns = () => {
         <div className="hidden md:block">
           <IndustrialDesignsTable
             industrialDesigns={INDUSTRIAL_DESIGNS_MOCKUP}
+            onOpenIndustrialDesignsModal={handleOpenProcessModal}
           />
         </div>
       </CardContent>
+
+      <ManageProcessModal
+        open={isOpenProcessModal}
+        onOpenChange={() => setIsOpenProcessModal(false)}
+        onSave={() => setIsOpenProcessModal(false)}
+        mode={manageProcessMode}
+        initialData={
+          selectedProcess
+            ? {
+                ...selectedProcess,
+                processNumber: selectedProcess.process,
+              }
+            : undefined
+        }
+      />
     </Card>
   );
 };
