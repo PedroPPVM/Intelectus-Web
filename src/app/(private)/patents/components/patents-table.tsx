@@ -97,6 +97,7 @@ const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
             <TableHead>N° do Processo</TableHead>
             <TableHead>Título</TableHead>
             <TableHead>Apelido</TableHead>
+            <TableHead>Situação</TableHead>
             <TableHead>Depositante</TableHead>
             <TableHead>CNPJ/CPF</TableHead>
             <TableHead>Procurador</TableHead>
@@ -114,6 +115,7 @@ const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
               </TableCell>
               <TableCell>{patent.title}</TableCell>
               <TableCell>{patent.title.slice(0, 3)}</TableCell>
+              <TableCell>{patent.situation}</TableCell>
               <TableCell>{patent.depositor}</TableCell>
               <TableCell>
                 {patent.cnpj_depositor || patent.cpf_depositor}

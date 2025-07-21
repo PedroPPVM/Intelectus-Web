@@ -100,6 +100,7 @@ const ComputerProgramsTable = ({
             <TableHead>N° do Processo</TableHead>
             <TableHead>Título</TableHead>
             <TableHead>Apelido</TableHead>
+            <TableHead>Situação</TableHead>
             <TableHead>Depositante</TableHead>
             <TableHead>CNPJ/CPF</TableHead>
             <TableHead>Procurador</TableHead>
@@ -117,6 +118,7 @@ const ComputerProgramsTable = ({
               </TableCell>
               <TableCell>{computerProgram.title}</TableCell>
               <TableCell>{computerProgram.title.slice(0, 3)}</TableCell>
+              <TableCell>{computerProgram.situation}</TableCell>
               <TableCell>{computerProgram.depositor}</TableCell>
               <TableCell>
                 {computerProgram.cnpj_depositor ||

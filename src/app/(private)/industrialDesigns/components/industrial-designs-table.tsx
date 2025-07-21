@@ -100,6 +100,7 @@ const IndustrialDesignsTable = ({
             <TableHead>N° do Processo</TableHead>
             <TableHead>Título</TableHead>
             <TableHead>Apelido</TableHead>
+            <TableHead>Situação</TableHead>
             <TableHead>Depositante</TableHead>
             <TableHead>CNPJ/CPF</TableHead>
             <TableHead>Procurador</TableHead>
@@ -120,6 +121,7 @@ const IndustrialDesignsTable = ({
               </TableCell>
               <TableCell>{industrialDesign.title}</TableCell>
               <TableCell>{industrialDesign.title.slice(0, 3)}</TableCell>
+              <TableCell>{industrialDesign.situation}</TableCell>
               <TableCell>{industrialDesign.depositor}</TableCell>
               <TableCell>
                 {industrialDesign.cnpj_depositor ||
