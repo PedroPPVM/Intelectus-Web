@@ -16,21 +16,44 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { MoreHorizontal } from 'lucide-react';
-import { Patent } from '../page';
 import dayjs from 'dayjs';
 import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteProcess } from '@/services/Processes/processes';
 
 interface PatentsTableProps {
-  patents: Patent[];
-  onOpenPatentsModal: (patent: Patent) => void;
+  patents: Process.Entity[];
+  onOpenPatentsModal: (patent: Process.Entity) => void;
 }
 
 const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
+  const companyByLocalStorage = getSelectedCompany();
+  const queryClient = useQueryClient();
+
   const [isOpenDeleteConfirmModal, setIsOpenDeleteConfirmModal] =
     useState<boolean>(false);
+  const [processIdToDelete, setProcessIdToDelete] = useState<string | null>(
+    null,
+  );
 
-  const actionsOptions = (patent: Patent) => {
+  const { mutateAsync: onDeleteProcess, isPending: isDeletingProcess } =
+    useMutation({
+      mutationKey: ['delete-process'],
+      mutationFn: async (processId: string) =>
+        deleteProcess({
+          companyId: companyByLocalStorage?.id || '',
+          processId: processId,
+        }),
+      onSuccess: () => {
+        setProcessIdToDelete(null);
+
+        queryClient.invalidateQueries({ queryKey: ['get-patents'] });
+      },
+    });
+
+  const actionsOptions = (patent: Process.Entity) => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -48,7 +71,10 @@ const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => setIsOpenDeleteConfirmModal(true)}
+            onClick={() => {
+              setIsOpenDeleteConfirmModal(true);
+              setProcessIdToDelete(patent.id || '');
+            }}
           >
             Excluir
           </DropdownMenuItem>
@@ -56,6 +82,12 @@ const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
       </DropdownMenu>
     );
   };
+
+  const handleDeleteProcess = useCallback(() => {
+    if (processIdToDelete) onDeleteProcess(processIdToDelete);
+
+    setIsOpenDeleteConfirmModal(false);
+  }, [processIdToDelete]);
 
   return (
     <div className="max-h-full overflow-auto">
@@ -77,20 +109,24 @@ const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
         <TableBody>
           {patents.map((patent) => (
             <TableRow key={patent.id} className="hover:bg-transparent">
-              <TableCell className="font-medium">{patent.process}</TableCell>
+              <TableCell className="font-medium">
+                {patent.process_number}
+              </TableCell>
               <TableCell>{patent.title}</TableCell>
-              <TableCell>{patent.shortName}</TableCell>
+              <TableCell>{patent.title.slice(0, 3)}</TableCell>
               <TableCell>{patent.depositor}</TableCell>
-              <TableCell>{patent.cnpj || patent.cpf}</TableCell>
+              <TableCell>
+                {patent.cnpj_depositor || patent.cpf_depositor}
+              </TableCell>
               <TableCell>{patent.attorney}</TableCell>
               <TableCell>
-                {dayjs(patent.depositDate).format('DD/MM/YYYY')}
+                {dayjs(patent.deposit_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell>
-                {dayjs(patent.concessionDate).format('DD/MM/YYYY')}
+                {dayjs(patent.concession_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell>
-                {dayjs(patent.validityDate).format('DD/MM/YYYY')}
+                {dayjs(patent.validity_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="w-[50px]">
                 {actionsOptions(patent)}
@@ -103,7 +139,7 @@ const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
       <DeleteConfirmModal
         open={isOpenDeleteConfirmModal}
         onOpenChange={() => setIsOpenDeleteConfirmModal(false)}
-        onConfirm={() => setIsOpenDeleteConfirmModal(false)}
+        onConfirm={handleDeleteProcess}
       />
     </div>
   );
