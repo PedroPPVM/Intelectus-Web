@@ -1,28 +1,33 @@
-import type { Metadata } from 'next';
+'use client';
+
 import '../globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
-
-export const metadata: Metadata = {
-  title: 'Login',
-  description: 'Make login with your account',
-};
+import { AuthProvider } from '@/contexts/AuthContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState } from 'react';
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
     <html lang="en">
       <body className="flex min-h-screen flex-col antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <AuthProvider>
+          <QueryClientProvider client={queryClient}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </QueryClientProvider>
+        </AuthProvider>
       </body>
     </html>
   );

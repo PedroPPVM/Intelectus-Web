@@ -18,33 +18,30 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-
-const companies = [
-  {
-    value: 'Empresa 1',
-    label: 'Empresa 1',
-  },
-  {
-    value: 'Empresa 2',
-    label: 'Empresa 2',
-  },
-  {
-    value: 'Empresa 3',
-    label: 'Empresa 3',
-  },
-  {
-    value: 'Empresa 4',
-    label: 'Empresa 4',
-  },
-  {
-    value: 'Empresa 5',
-    label: 'Empresa 5',
-  },
-];
+import { useQuery } from '@tanstack/react-query';
+import { getCompanies } from '@/services/Companies/companies';
+import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 
 export function CompanyCombobox() {
+  const companyByLocalStorage = getSelectedCompany();
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState('');
+  const [value, setValue] = React.useState(companyByLocalStorage?.id || []);
+
+  const { data: companiesResult, isFetching: isLoadingCompanies } = useQuery({
+    queryKey: ['get-companies'],
+    queryFn: async () => await getCompanies(),
+  });
+
+  const companies = React.useMemo(() => {
+    if (!companiesResult) return [];
+
+    setValue(companyByLocalStorage?.id || '');
+
+    return companiesResult.data.map((company) => ({
+      value: company.id,
+      label: company.name,
+    }));
+  }, [companiesResult, localStorage.getItem('companies')]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -56,7 +53,7 @@ export function CompanyCombobox() {
           className="w-full justify-between"
         >
           {value
-            ? companies.find((framework) => framework.value === value)?.label
+            ? companies.find((company) => company.value === value)?.label
             : 'Selecione uma Empresa'}
 
           <ChevronsUpDown className="opacity-50" />
@@ -74,7 +71,7 @@ export function CompanyCombobox() {
                   key={company.value}
                   value={company.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? '' : currentValue);
+                    setValue(currentValue);
                     setOpen(false);
                   }}
                   className="cursor-pointer"

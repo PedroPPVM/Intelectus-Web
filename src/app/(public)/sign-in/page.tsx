@@ -1,29 +1,41 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
 
 export default function SignIn() {
-  const router = useRouter();
+  const { signIn } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = () => {
-    router.push('/brands');
+  const { mutateAsync: onSignIn, isPending: isLoadingSignIn } = useMutation({
+    mutationKey: ['sign-in'],
+    mutationFn: async ({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }) => await signIn(email, password),
+  });
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onSignIn({ email, password });
   };
 
   return (
     <div className="bg-background flex min-h-screen flex-col items-center justify-center gap-4 px-4">
       <Card className="w-[400px]">
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2 pt-4">
           <span className="text-2xl font-bold">Intelectus</span>
-          <span className="text-zinc-400">
+          <span className="text-sm text-zinc-400">
             Sistema de Leitura de Revista do INPI
           </span>
         </div>
@@ -33,22 +45,42 @@ export default function SignIn() {
         </CardHeader>
 
         <CardContent>
-          <form className="flex flex-col gap-6">
-            <Input type="email" placeholder="Email" />
+          <form className="flex flex-col gap-6" onSubmit={handleLogin}>
+            <Input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
-            <div className="flex flex-col items-start gap-2">
-              <Input type="password" placeholder="Senha" />
+            <div className="relative">
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Senha"
+                className="pr-10"
+                onChange={(e) => setPassword(e.target.value)}
+              />
 
               <button
                 type="button"
-                onClick={() => {}}
-                className="cursor-pointer text-sm hover:underline"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="text-muted-foreground absolute top-2 right-3 cursor-pointer"
               >
-                Esqueceu sua senha?
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
 
-            <Button onClick={handleLogin}>Entrar</Button>
+            <Button
+              type="submit"
+              disabled={isLoadingSignIn}
+              className="disabled:bg-gray-400"
+            >
+              {isLoadingSignIn && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+
+              <span>Entrar</span>
+            </Button>
           </form>
         </CardContent>
       </Card>
