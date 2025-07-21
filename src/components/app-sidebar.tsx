@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
+import { getLoggedUser } from '@/utils/get-user-by-local-storage';
 
 const items = [
   // TODO: Tela de Dashboards virá futuramente
@@ -59,6 +60,7 @@ const items = [
 
 export function AppSidebar() {
   const { signOut } = useAuth();
+  const { full_name } = getLoggedUser();
 
   return (
     <Sidebar>
@@ -88,7 +90,7 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild className="cursor-pointer">
                 <SidebarMenuButton>
-                  <User2 /> Username
+                  <User2 /> {full_name}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
