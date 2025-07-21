@@ -19,6 +19,7 @@ export interface ProcessProps {
   id?: string;
   process_number: string;
   title: string;
+  situation: string;
   depositor: string;
   cnpj_depositor: string;
   cpf_depositor: string;
@@ -31,6 +32,7 @@ export interface ProcessProps {
 const processSchema = z.object({
   process_number: z.string().min(1, 'Informe um número de processo válido.'),
   title: z.string().min(1, 'Informe o nome da marca.'),
+  situation: z.string().min(1, 'Informe a situação da marca.'),
   depositor: z.string().min(1, 'Informe o depositante.'),
   cnpj_depositor: z.string().optional(),
   cpf_depositor: z.string().optional(),
@@ -44,6 +46,7 @@ type ProcessFormSchema = {
   id?: string;
   process_number: string;
   title: string;
+  situation: string;
   depositor: string;
   cnpj_depositor?: string;
   cpf_depositor?: string;
@@ -85,6 +88,7 @@ export function ManageProcessModal({
       id: initialData?.id ?? '',
       process_number: initialData?.process_number ?? '',
       title: initialData?.title ?? '',
+      situation: initialData?.situation ?? '',
       depositor: initialData?.depositor ?? '',
       cnpj_depositor: initialData?.cnpj_depositor ?? '',
       cpf_depositor: initialData?.cpf_depositor ?? '',
@@ -107,6 +111,7 @@ export function ManageProcessModal({
         id: initialData?.id ?? '',
         process_number: initialData?.process_number ?? '',
         title: initialData?.title ?? '',
+        situation: initialData?.situation ?? '',
         depositor: initialData?.depositor ?? '',
         cnpj_depositor: initialData?.cnpj_depositor ?? '',
         cpf_depositor: initialData?.cpf_depositor ?? '',
@@ -129,6 +134,7 @@ export function ManageProcessModal({
       id: watch('id'),
       process_number: data.process_number,
       title: data.title,
+      situation: data.situation,
       depositor: data.depositor,
       cnpj_depositor: data.cnpj_depositor || '',
       cpf_depositor: data.cpf_depositor || '',
@@ -173,6 +179,15 @@ export function ManageProcessModal({
               {errors.title && (
                 <span className="text-xs text-red-500">
                   {errors.title.message}
+                </span>
+              )}
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">Situação</label>
+              <Input {...register('situation')} />
+              {errors.situation && (
+                <span className="text-xs text-red-500">
+                  {errors.situation.message}
                 </span>
               )}
             </div>

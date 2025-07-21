@@ -96,6 +96,7 @@ const BrandsTable = ({ brands, onOpenBrandModal }: BrandsTableProps) => {
           <TableRow className="hover:bg-transparent">
             <TableHead>N° do Processo</TableHead>
             <TableHead>Marca</TableHead>
+            <TableHead>Situação</TableHead>
             <TableHead>Depositante</TableHead>
             <TableHead>CNPJ/CPF</TableHead>
             <TableHead>Procurador</TableHead>
@@ -112,6 +113,7 @@ const BrandsTable = ({ brands, onOpenBrandModal }: BrandsTableProps) => {
                 {brand.process_number}
               </TableCell>
               <TableCell>{brand.title}</TableCell>
+              <TableCell>{brand.situation}</TableCell>
               <TableCell>{brand.depositor}</TableCell>
               <TableCell>
                 {brand.cnpj_depositor || brand.cpf_depositor}
