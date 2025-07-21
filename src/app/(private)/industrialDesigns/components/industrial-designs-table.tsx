@@ -16,24 +16,47 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { MoreHorizontal } from 'lucide-react';
-import { IndustrialDesign } from '../page';
 import dayjs from 'dayjs';
 import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteProcess } from '@/services/Processes/processes';
+import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 
 interface IndustrialDesignsTableProps {
-  industrialDesigns: IndustrialDesign[];
-  onOpenIndustrialDesignsModal: (industrialDesign: IndustrialDesign) => void;
+  industrialDesigns: Process.Entity[];
+  onOpenIndustrialDesignsModal: (industrialDesign: Process.Entity) => void;
 }
 
 const IndustrialDesignsTable = ({
   industrialDesigns,
   onOpenIndustrialDesignsModal,
 }: IndustrialDesignsTableProps) => {
+  const companyByLocalStorage = getSelectedCompany();
+  const queryClient = useQueryClient();
+
   const [isOpenDeleteConfirmModal, setIsOpenDeleteConfirmModal] =
     useState<boolean>(false);
+  const [processIdToDelete, setProcessIdToDelete] = useState<string | null>(
+    null,
+  );
 
-  const actionsOptions = (industrialDesign: IndustrialDesign) => {
+  const { mutateAsync: onDeleteProcess, isPending: isDeletingProcess } =
+    useMutation({
+      mutationKey: ['delete-process'],
+      mutationFn: async (processId: string) =>
+        deleteProcess({
+          companyId: companyByLocalStorage?.id || '',
+          processId: processId,
+        }),
+      onSuccess: () => {
+        setProcessIdToDelete(null);
+
+        queryClient.invalidateQueries({ queryKey: ['get-industrial-designs'] });
+      },
+    });
+
+  const actionsOptions = (industrialDesign: Process.Entity) => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -51,7 +74,10 @@ const IndustrialDesignsTable = ({
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => setIsOpenDeleteConfirmModal(true)}
+            onClick={() => {
+              setIsOpenDeleteConfirmModal(true);
+              setProcessIdToDelete(industrialDesign.id || '');
+            }}
           >
             Excluir
           </DropdownMenuItem>
@@ -59,6 +85,12 @@ const IndustrialDesignsTable = ({
       </DropdownMenu>
     );
   };
+
+  const handleDeleteProcess = useCallback(() => {
+    if (processIdToDelete) onDeleteProcess(processIdToDelete);
+
+    setIsOpenDeleteConfirmModal(false);
+  }, [processIdToDelete]);
 
   return (
     <div className="max-h-full overflow-auto">
@@ -84,23 +116,24 @@ const IndustrialDesignsTable = ({
               className="hover:bg-transparent"
             >
               <TableCell className="font-medium">
-                {industrialDesign.process}
+                {industrialDesign.process_number}
               </TableCell>
               <TableCell>{industrialDesign.title}</TableCell>
-              <TableCell>{industrialDesign.shortName}</TableCell>
+              <TableCell>{industrialDesign.title.slice(0, 3)}</TableCell>
               <TableCell>{industrialDesign.depositor}</TableCell>
               <TableCell>
-                {industrialDesign.cnpj || industrialDesign.cpf}
+                {industrialDesign.cnpj_depositor ||
+                  industrialDesign.cpf_depositor}
               </TableCell>
               <TableCell>{industrialDesign.attorney}</TableCell>
               <TableCell>
-                {dayjs(industrialDesign.depositDate).format('DD/MM/YYYY')}
+                {dayjs(industrialDesign.deposit_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell>
-                {dayjs(industrialDesign.concessionDate).format('DD/MM/YYYY')}
+                {dayjs(industrialDesign.concession_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell>
-                {dayjs(industrialDesign.validityDate).format('DD/MM/YYYY')}
+                {dayjs(industrialDesign.validity_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="w-[50px]">
                 {actionsOptions(industrialDesign)}
@@ -113,7 +146,7 @@ const IndustrialDesignsTable = ({
       <DeleteConfirmModal
         open={isOpenDeleteConfirmModal}
         onOpenChange={() => setIsOpenDeleteConfirmModal(false)}
-        onConfirm={() => setIsOpenDeleteConfirmModal(false)}
+        onConfirm={handleDeleteProcess}
       />
     </div>
   );

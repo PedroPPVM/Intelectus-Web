@@ -16,24 +16,47 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { MoreHorizontal } from 'lucide-react';
-import { ComputerProgram } from '../page';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
+import { deleteProcess } from '@/services/Processes/processes';
 
 interface ComputerProgramsTableProps {
-  computerPrograms: ComputerProgram[];
-  onOpenComputerProgramModal: (computerProgram: ComputerProgram) => void;
+  computerPrograms: Process.Entity[];
+  onOpenComputerProgramModal: (computerProgram: Process.Entity) => void;
 }
 
 const ComputerProgramsTable = ({
   computerPrograms,
   onOpenComputerProgramModal,
 }: ComputerProgramsTableProps) => {
+  const companyByLocalStorage = getSelectedCompany();
+  const queryClient = useQueryClient();
+
   const [isOpenDeleteConfirmModal, setIsOpenDeleteConfirmModal] =
     useState<boolean>(false);
+  const [processIdToDelete, setProcessIdToDelete] = useState<string | null>(
+    null,
+  );
 
-  const actionsOptions = (computerProgram: ComputerProgram) => {
+  const { mutateAsync: onDeleteProcess, isPending: isDeletingProcess } =
+    useMutation({
+      mutationKey: ['delete-process'],
+      mutationFn: async (processId: string) =>
+        deleteProcess({
+          companyId: companyByLocalStorage?.id || '',
+          processId: processId,
+        }),
+      onSuccess: () => {
+        setProcessIdToDelete(null);
+
+        queryClient.invalidateQueries({ queryKey: ['get-computer-programs'] });
+      },
+    });
+
+  const actionsOptions = (computerProgram: Process.Entity) => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -51,7 +74,10 @@ const ComputerProgramsTable = ({
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => setIsOpenDeleteConfirmModal(true)}
+            onClick={() => {
+              setIsOpenDeleteConfirmModal(true);
+              setProcessIdToDelete(computerProgram.id || '');
+            }}
           >
             Excluir
           </DropdownMenuItem>
@@ -59,6 +85,12 @@ const ComputerProgramsTable = ({
       </DropdownMenu>
     );
   };
+
+  const handleDeleteProcess = useCallback(() => {
+    if (processIdToDelete) onDeleteProcess(processIdToDelete);
+
+    setIsOpenDeleteConfirmModal(false);
+  }, [processIdToDelete]);
 
   return (
     <div className={`max-h-full max-w-[calc(100vw-360px)] overflow-auto`}>
@@ -81,23 +113,24 @@ const ComputerProgramsTable = ({
           {computerPrograms.map((computerProgram) => (
             <TableRow key={computerProgram.id} className="hover:bg-transparent">
               <TableCell className="font-medium">
-                {computerProgram.process}
+                {computerProgram.process_number}
               </TableCell>
               <TableCell>{computerProgram.title}</TableCell>
-              <TableCell>{computerProgram.shortTitle}</TableCell>
+              <TableCell>{computerProgram.title.slice(0, 3)}</TableCell>
               <TableCell>{computerProgram.depositor}</TableCell>
               <TableCell>
-                {computerProgram.cnpj || computerProgram.cpf}
+                {computerProgram.cnpj_depositor ||
+                  computerProgram.cpf_depositor}
               </TableCell>
               <TableCell>{computerProgram.attorney}</TableCell>
               <TableCell>
-                {dayjs(computerProgram.depositDate).format('DD/MM/YYYY')}
+                {dayjs(computerProgram.deposit_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell>
-                {dayjs(computerProgram.concessionDate).format('DD/MM/YYYY')}
+                {dayjs(computerProgram.concession_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell>
-                {dayjs(computerProgram.validityDate).format('DD/MM/YYYY')}
+                {dayjs(computerProgram.validity_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="w-[50px]">
                 {actionsOptions(computerProgram)}
@@ -110,7 +143,7 @@ const ComputerProgramsTable = ({
       <DeleteConfirmModal
         open={isOpenDeleteConfirmModal}
         onOpenChange={() => setIsOpenDeleteConfirmModal(false)}
-        onConfirm={() => setIsOpenDeleteConfirmModal(false)}
+        onConfirm={handleDeleteProcess}
       />
     </div>
   );
