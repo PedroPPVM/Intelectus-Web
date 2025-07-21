@@ -15,47 +15,49 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { DatePickerField } from './date-picker-field';
 import dayjs from 'dayjs';
 
-interface Process {
-  processNumber: string;
+export interface ProcessProps {
+  id?: string;
+  process_number: string;
   title: string;
   depositor: string;
-  cnpj: string;
-  cpf: string;
+  cnpj_depositor: string;
+  cpf_depositor: string;
   attorney: string;
-  depositDate: Date;
-  concessionDate: Date;
-  validityDate: Date;
+  deposit_date: Date;
+  concession_date: Date;
+  validity_date: Date;
 }
 
 const processSchema = z.object({
-  processNumber: z.string().min(1, 'Informe um número de processo válido.'),
+  process_number: z.string().min(1, 'Informe um número de processo válido.'),
   title: z.string().min(1, 'Informe o nome da marca.'),
   depositor: z.string().min(1, 'Informe o depositante.'),
-  cnpj: z.string().optional(),
-  cpf: z.string().optional(),
+  cnpj_depositor: z.string().optional(),
+  cpf_depositor: z.string().optional(),
   attorney: z.string().min(1, 'Informe o procurador.'),
-  depositDate: z.string().min(1, 'Informe a data do depósito.'),
-  concessionDate: z.string().min(1, 'Informe a data da concessão.'),
-  validityDate: z.string().min(1, 'Informe a vigência.'),
+  deposit_date: z.string().min(1, 'Informe a data do depósito.'),
+  concession_date: z.string().min(1, 'Informe a data da concessão.'),
+  validity_date: z.string().min(1, 'Informe a vigência.'),
 });
 
 type ProcessFormSchema = {
-  processNumber: string;
+  id?: string;
+  process_number: string;
   title: string;
   depositor: string;
-  cnpj?: string;
-  cpf?: string;
+  cnpj_depositor?: string;
+  cpf_depositor?: string;
   attorney: string;
-  depositDate: string;
-  concessionDate: string;
-  validityDate: string;
+  deposit_date: string;
+  concession_date: string;
+  validity_date: string;
 };
 
 interface ManageProcessModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  initialData?: Process;
-  onSave: (data: Process) => void;
+  initialData?: ProcessProps;
+  onSave: (data: ProcessProps) => void;
   mode?: 'create' | 'edit';
 }
 
@@ -66,9 +68,9 @@ export function ManageProcessModal({
   onSave,
   mode = 'create',
 }: ManageProcessModalProps) {
-  const [depositDateOpen, setDepositDateOpen] = useState(false);
-  const [concessionDateOpen, setConcessionDateOpen] = useState(false);
-  const [validityDateOpen, setValidityDateOpen] = useState(false);
+  const [deposit_dateOpen, setDepositDateOpen] = useState(false);
+  const [concession_dateOpen, setConcessionDateOpen] = useState(false);
+  const [validity_dateOpen, setValidityDateOpen] = useState(false);
 
   const {
     register,
@@ -80,20 +82,21 @@ export function ManageProcessModal({
   } = useForm<ProcessFormSchema>({
     resolver: zodResolver(processSchema),
     defaultValues: {
-      processNumber: initialData?.processNumber ?? '',
+      id: initialData?.id ?? '',
+      process_number: initialData?.process_number ?? '',
       title: initialData?.title ?? '',
       depositor: initialData?.depositor ?? '',
-      cnpj: initialData?.cnpj ?? '',
-      cpf: initialData?.cpf ?? '',
+      cnpj_depositor: initialData?.cnpj_depositor ?? '',
+      cpf_depositor: initialData?.cpf_depositor ?? '',
       attorney: initialData?.attorney ?? '',
-      depositDate: initialData?.depositDate
-        ? dayjs(initialData.depositDate).format('YYYY-MM-DD')
+      deposit_date: initialData?.deposit_date
+        ? dayjs(initialData.deposit_date).format('YYYY-MM-DD')
         : '',
-      concessionDate: initialData?.concessionDate
-        ? dayjs(initialData.concessionDate).format('YYYY-MM-DD')
+      concession_date: initialData?.concession_date
+        ? dayjs(initialData.concession_date).format('YYYY-MM-DD')
         : '',
-      validityDate: initialData?.validityDate
-        ? dayjs(initialData.validityDate).format('YYYY-MM-DD')
+      validity_date: initialData?.validity_date
+        ? dayjs(initialData.validity_date).format('YYYY-MM-DD')
         : '',
     },
   });
@@ -101,20 +104,21 @@ export function ManageProcessModal({
   useEffect(() => {
     if (open) {
       reset({
-        processNumber: initialData?.processNumber ?? '',
+        id: initialData?.id ?? '',
+        process_number: initialData?.process_number ?? '',
         title: initialData?.title ?? '',
         depositor: initialData?.depositor ?? '',
-        cnpj: initialData?.cnpj ?? '',
-        cpf: initialData?.cpf ?? '',
+        cnpj_depositor: initialData?.cnpj_depositor ?? '',
+        cpf_depositor: initialData?.cpf_depositor ?? '',
         attorney: initialData?.attorney ?? '',
-        depositDate: initialData?.depositDate
-          ? dayjs(initialData.depositDate).format('YYYY-MM-DD')
+        deposit_date: initialData?.deposit_date
+          ? dayjs(initialData.deposit_date).format('YYYY-MM-DD')
           : '',
-        concessionDate: initialData?.concessionDate
-          ? dayjs(initialData.concessionDate).format('YYYY-MM-DD')
+        concession_date: initialData?.concession_date
+          ? dayjs(initialData.concession_date).format('YYYY-MM-DD')
           : '',
-        validityDate: initialData?.validityDate
-          ? dayjs(initialData.validityDate).format('YYYY-MM-DD')
+        validity_date: initialData?.validity_date
+          ? dayjs(initialData.validity_date).format('YYYY-MM-DD')
           : '',
       });
     }
@@ -122,15 +126,16 @@ export function ManageProcessModal({
 
   function onSubmit(data: ProcessFormSchema) {
     onSave({
-      processNumber: data.processNumber,
+      id: watch('id'),
+      process_number: data.process_number,
       title: data.title,
       depositor: data.depositor,
-      cnpj: data.cnpj || '',
-      cpf: data.cpf || '',
+      cnpj_depositor: data.cnpj_depositor || '',
+      cpf_depositor: data.cpf_depositor || '',
       attorney: data.attorney,
-      depositDate: new Date(data.depositDate),
-      concessionDate: new Date(data.concessionDate),
-      validityDate: new Date(data.validityDate),
+      deposit_date: new Date(data.deposit_date),
+      concession_date: new Date(data.concession_date),
+      validity_date: new Date(data.validity_date),
     });
     onOpenChange(false);
   }
@@ -155,10 +160,10 @@ export function ManageProcessModal({
               <label className="mb-1 block text-sm font-medium">
                 N° do Processo
               </label>
-              <Input type="number" {...register('processNumber')} />
-              {errors.processNumber && (
+              <Input type="number" {...register('process_number')} />
+              {errors.process_number && (
                 <span className="text-xs text-red-500">
-                  {errors.processNumber.message}
+                  {errors.process_number.message}
                 </span>
               )}
             </div>
@@ -184,19 +189,19 @@ export function ManageProcessModal({
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium">CNPJ</label>
-              <Input {...register('cnpj')} />
-              {errors.cnpj && (
+              <Input {...register('cnpj_depositor')} />
+              {errors.cnpj_depositor && (
                 <span className="text-xs text-red-500">
-                  {errors.cnpj.message}
+                  {errors.cnpj_depositor.message}
                 </span>
               )}
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium">CPF</label>
-              <Input {...register('cpf')} />
-              {errors.cpf && (
+              <Input {...register('cpf_depositor')} />
+              {errors.cpf_depositor && (
                 <span className="text-xs text-red-500">
-                  {errors.cpf.message}
+                  {errors.cpf_depositor.message}
                 </span>
               )}
             </div>
@@ -212,28 +217,28 @@ export function ManageProcessModal({
               )}
             </div>
             <DatePickerField
-              value={watch('depositDate')}
-              setValue={(value) => setValue('depositDate', value)}
+              value={watch('deposit_date')}
+              setValue={(value) => setValue('deposit_date', value)}
               label="Data do Depósito"
-              isOpen={depositDateOpen}
+              isOpen={deposit_dateOpen}
               setIsOpen={setDepositDateOpen}
-              error={errors.depositDate?.message}
+              error={errors.deposit_date?.message}
             />
             <DatePickerField
-              value={watch('concessionDate')}
-              setValue={(value) => setValue('concessionDate', value)}
+              value={watch('concession_date')}
+              setValue={(value) => setValue('concession_date', value)}
               label="Data da Concessão"
-              isOpen={concessionDateOpen}
+              isOpen={concession_dateOpen}
               setIsOpen={setConcessionDateOpen}
-              error={errors.concessionDate?.message}
+              error={errors.concession_date?.message}
             />
             <DatePickerField
-              value={watch('validityDate')}
-              setValue={(value) => setValue('validityDate', value)}
+              value={watch('validity_date')}
+              setValue={(value) => setValue('validity_date', value)}
               label="Vigência"
-              isOpen={validityDateOpen}
+              isOpen={validity_dateOpen}
               setIsOpen={setValidityDateOpen}
-              error={errors.validityDate?.message}
+              error={errors.validity_date?.message}
             />
           </div>
 

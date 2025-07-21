@@ -16,21 +16,44 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { MoreHorizontal } from 'lucide-react';
-import { Brand } from '../page';
 import dayjs from 'dayjs';
 import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteProcess } from '@/services/Processes/processes';
+import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 
 interface BrandsTableProps {
-  brands: Brand[];
-  onOpenBrandModal: (brand: Brand) => void;
+  brands: Process.Entity[];
+  onOpenBrandModal: (brand: Process.Entity) => void;
 }
 
 const BrandsTable = ({ brands, onOpenBrandModal }: BrandsTableProps) => {
+  const companyByLocalStorage = getSelectedCompany();
+  const queryClient = useQueryClient();
+
   const [isOpenDeleteConfirmModal, setIsOpenDeleteConfirmModal] =
     useState<boolean>(false);
+  const [processIdToDelete, setProcessIdToDelete] = useState<string | null>(
+    null,
+  );
 
-  const actionsOptions = (brand: Brand) => {
+  const { mutateAsync: onDeleteProcess, isPending: isDeletingProcess } =
+    useMutation({
+      mutationKey: ['delete-process'],
+      mutationFn: async (processId: string) =>
+        deleteProcess({
+          companyId: companyByLocalStorage?.id || '',
+          processId: processId,
+        }),
+      onSuccess: () => {
+        setProcessIdToDelete(null);
+
+        queryClient.invalidateQueries({ queryKey: ['get-brands'] });
+      },
+    });
+
+  const actionsOptions = (brand: Process.Entity) => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -47,7 +70,10 @@ const BrandsTable = ({ brands, onOpenBrandModal }: BrandsTableProps) => {
             Editar
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => setIsOpenDeleteConfirmModal(true)}
+            onClick={() => {
+              setIsOpenDeleteConfirmModal(true);
+              setProcessIdToDelete(brand.id || '');
+            }}
             className="cursor-pointer"
           >
             Excluir
@@ -56,6 +82,12 @@ const BrandsTable = ({ brands, onOpenBrandModal }: BrandsTableProps) => {
       </DropdownMenu>
     );
   };
+
+  const handleDeleteProcess = useCallback(() => {
+    if (processIdToDelete) onDeleteProcess(processIdToDelete);
+
+    setIsOpenDeleteConfirmModal(false);
+  }, [processIdToDelete]);
 
   return (
     <div className="max-h-full overflow-auto">
@@ -76,19 +108,23 @@ const BrandsTable = ({ brands, onOpenBrandModal }: BrandsTableProps) => {
         <TableBody>
           {brands.map((brand) => (
             <TableRow key={brand.id} className="hover:bg-transparent">
-              <TableCell className="font-medium">{brand.process}</TableCell>
-              <TableCell>{brand.name}</TableCell>
+              <TableCell className="font-medium">
+                {brand.process_number}
+              </TableCell>
+              <TableCell>{brand.title}</TableCell>
               <TableCell>{brand.depositor}</TableCell>
-              <TableCell>{brand.cnpj || brand.cpf}</TableCell>
+              <TableCell>
+                {brand.cnpj_depositor || brand.cpf_depositor}
+              </TableCell>
               <TableCell>{brand.attorney}</TableCell>
               <TableCell>
-                {dayjs(brand.depositDate).format('DD/MM/YYYY')}
+                {dayjs(brand.deposit_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell>
-                {dayjs(brand.concessionDate).format('DD/MM/YYYY')}
+                {dayjs(brand.concession_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell>
-                {dayjs(brand.validityDate).format('DD/MM/YYYY')}
+                {dayjs(brand.validity_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="w-[50px]">
                 {actionsOptions(brand)}
@@ -101,7 +137,7 @@ const BrandsTable = ({ brands, onOpenBrandModal }: BrandsTableProps) => {
       <DeleteConfirmModal
         open={isOpenDeleteConfirmModal}
         onOpenChange={() => setIsOpenDeleteConfirmModal(false)}
-        onConfirm={() => setIsOpenDeleteConfirmModal(false)}
+        onConfirm={handleDeleteProcess}
       />
     </div>
   );

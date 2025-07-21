@@ -26,6 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import { useAuth } from '@/contexts/AuthContext';
 
 const items = [
   // TODO: Tela de Dashboards virá futuramente
@@ -57,6 +58,8 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const { signOut } = useAuth();
+
   return (
     <Sidebar>
       <SidebarContent className="pt-1.5">
@@ -98,7 +101,7 @@ export function AppSidebar() {
                   <span>Editar Perfil</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <a href={'/sign-in'}>
+                  <a href={'/sign-in'} onClick={() => signOut()}>
                     <span>Sair</span>
                   </a>
                 </DropdownMenuItem>
