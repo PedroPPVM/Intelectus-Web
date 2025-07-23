@@ -26,6 +26,7 @@ import {
 } from '@/services/Processes/processes';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 import { ScrapeConfirmModal } from '@/components/scrape-confirm-modal';
+import { toast } from 'sonner';
 
 interface IndustrialDesignsTableProps {
   industrialDesigns: Process.Entity[];
@@ -58,11 +59,17 @@ const IndustrialDesignsTable = ({
         scrapeStatusByProcess({
           processId: processId,
         }),
-      onSuccess: () => {
+      onSuccess: ({ data }) => {
         setIsOpenScrapeConfirmModal(false);
         setProcessIdToScrape(null);
 
         queryClient.invalidateQueries({ queryKey: ['get-industrial-designs'] });
+
+        if (data.response === 'Nenhuma atualização necessária.')
+          toast.info(data.response);
+        else if (data.response === 'Processo não encontrado na revista.')
+          toast.error(data.response);
+        else toast.success(data.response);
       },
     });
 

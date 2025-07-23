@@ -26,6 +26,7 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 import { ScrapeConfirmModal } from '@/components/scrape-confirm-modal';
+import { toast } from 'sonner';
 
 interface ComputerProgramsTableProps {
   computerPrograms: Process.Entity[];
@@ -58,11 +59,17 @@ const ComputerProgramsTable = ({
         scrapeStatusByProcess({
           processId: processId,
         }),
-      onSuccess: () => {
+      onSuccess: ({ data }) => {
         setIsOpenScrapeConfirmModal(false);
         setProcessIdToScrape(null);
 
         queryClient.invalidateQueries({ queryKey: ['get-computer-programs'] });
+
+        if (data.response === 'Nenhuma atualização necessária.')
+          toast.info(data.response);
+        else if (data.response === 'Processo não encontrado na revista.')
+          toast.error(data.response);
+        else toast.success(data.response);
       },
     });
 

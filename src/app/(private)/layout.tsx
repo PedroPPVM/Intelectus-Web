@@ -9,6 +9,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { Toaster } from '@/components/ui/sonner';
 
 export default function RootLayout({
   children,
@@ -36,6 +37,8 @@ export default function RootLayout({
                   <div className="flex flex-1 flex-col gap-4 p-6">
                     {children}
                   </div>
+
+                  <Toaster richColors />
                 </div>
               </SidebarProvider>
             </QueryClientProvider>
