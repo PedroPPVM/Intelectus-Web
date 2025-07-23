@@ -39,3 +39,13 @@ export const deleteProcess = async ({companyId, processId}: {companyId: string, 
       alert('Erro ao excluir processo!');
     }
 };
+
+export const scrapeStatusByProcess = async ({processId}: {processId: string}) => {
+    try {
+      const response = await api.patch(`/processes/${processId}/scrape-status`);
+
+      return response;
+    } catch (error) {
+      throw "Erro ao realizar leitura da revista.";
+    }
+};

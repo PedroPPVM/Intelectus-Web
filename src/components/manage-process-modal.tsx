@@ -20,7 +20,7 @@ export interface ProcessProps {
   id?: string;
   process_number: string;
   title: string;
-  situation: string;
+  status: string;
   depositor: string;
   cnpj_depositor: string;
   cpf_depositor: string;
@@ -34,7 +34,7 @@ const processSchema = z
   .object({
     process_number: z.string().min(1, 'Informe um número de processo válido.'),
     title: z.string().min(1, 'Informe o nome da marca.'),
-    situation: z.string().min(1, 'Informe a situação da marca.'),
+    status: z.string().min(1, 'Informe o status da marca.'),
     depositor: z.string().min(1, 'Informe o depositante.'),
     cnpj_depositor: z
       .string()
@@ -62,7 +62,7 @@ type ProcessFormSchema = {
   id?: string;
   process_number: string;
   title: string;
-  situation: string;
+  status: string;
   depositor: string;
   cnpj_depositor?: string;
   cpf_depositor?: string;
@@ -105,7 +105,7 @@ export function ManageProcessModal({
       id: initialData?.id ?? '',
       process_number: initialData?.process_number ?? '',
       title: initialData?.title ?? '',
-      situation: initialData?.situation ?? '',
+      status: initialData?.status ?? '',
       depositor: initialData?.depositor ?? '',
       cnpj_depositor: initialData?.cnpj_depositor ?? '',
       cpf_depositor: initialData?.cpf_depositor ?? '',
@@ -128,7 +128,7 @@ export function ManageProcessModal({
         id: initialData?.id ?? '',
         process_number: initialData?.process_number ?? '',
         title: initialData?.title ?? '',
-        situation: initialData?.situation ?? '',
+        status: initialData?.status ?? '',
         depositor: initialData?.depositor ?? '',
         cnpj_depositor: initialData?.cnpj_depositor ?? '',
         cpf_depositor: initialData?.cpf_depositor ?? '',
@@ -151,7 +151,7 @@ export function ManageProcessModal({
       id: watch('id'),
       process_number: data.process_number,
       title: data.title,
-      situation: data.situation,
+      status: data.status,
       depositor: data.depositor,
       cnpj_depositor: data.cnpj_depositor || '',
       cpf_depositor: data.cpf_depositor || '',
@@ -183,7 +183,7 @@ export function ManageProcessModal({
               <label className="mb-1 block text-sm font-medium">
                 N° do Processo
               </label>
-              <Input type="number" {...register('process_number')} />
+              <Input {...register('process_number')} />
               {errors.process_number && (
                 <span className="text-xs text-red-500">
                   {errors.process_number.message}
@@ -201,10 +201,10 @@ export function ManageProcessModal({
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium">Situação</label>
-              <Input {...register('situation')} />
-              {errors.situation && (
+              <Input {...register('status')} />
+              {errors.status && (
                 <span className="text-xs text-red-500">
-                  {errors.situation.message}
+                  {errors.status.message}
                 </span>
               )}
             </div>

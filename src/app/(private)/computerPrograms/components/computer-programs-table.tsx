@@ -15,13 +15,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { MoreHorizontal } from 'lucide-react';
+import { FileSearch2, MoreHorizontal } from 'lucide-react';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
 import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
+import {
+  deleteProcess,
+  scrapeStatusByProcess,
+} from '@/services/Processes/processes';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
-import { deleteProcess } from '@/services/Processes/processes';
+import { ScrapeConfirmModal } from '@/components/scrape-confirm-modal';
 
 interface ComputerProgramsTableProps {
   computerPrograms: Process.Entity[];
@@ -35,11 +39,32 @@ const ComputerProgramsTable = ({
   const companyByLocalStorage = getSelectedCompany();
   const queryClient = useQueryClient();
 
+  const [isOpenScrapeConfirmModal, setIsOpenScrapeConfirmModal] =
+    useState<boolean>(false);
+  const [processIdToScrape, setProcessIdToScrape] = useState<string | null>(
+    null,
+  );
+
   const [isOpenDeleteConfirmModal, setIsOpenDeleteConfirmModal] =
     useState<boolean>(false);
   const [processIdToDelete, setProcessIdToDelete] = useState<string | null>(
     null,
   );
+
+  const { mutateAsync: onScrapeStatus, isPending: isScrappingStatus } =
+    useMutation({
+      mutationKey: ['scrape-status-by-process'],
+      mutationFn: async (processId: string) =>
+        scrapeStatusByProcess({
+          processId: processId,
+        }),
+      onSuccess: () => {
+        setIsOpenScrapeConfirmModal(false);
+        setProcessIdToScrape(null);
+
+        queryClient.invalidateQueries({ queryKey: ['get-computer-programs'] });
+      },
+    });
 
   const { mutateAsync: onDeleteProcess, isPending: isDeletingProcess } =
     useMutation({
@@ -97,6 +122,7 @@ const ComputerProgramsTable = ({
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
+            <TableHead className="w-[50px]"></TableHead>
             <TableHead>N° do Processo</TableHead>
             <TableHead>Título</TableHead>
             <TableHead>Apelido</TableHead>
@@ -113,12 +139,24 @@ const ComputerProgramsTable = ({
         <TableBody>
           {computerPrograms.map((computerProgram) => (
             <TableRow key={computerProgram.id} className="hover:bg-transparent">
+              <TableCell>
+                <button
+                  type="button"
+                  className="hover:bg-muted cursor-pointer rounded-full p-2 transition-all"
+                  onClick={() => {
+                    setProcessIdToScrape(computerProgram?.id || '');
+                    setIsOpenScrapeConfirmModal(true);
+                  }}
+                >
+                  <FileSearch2 />
+                </button>
+              </TableCell>
               <TableCell className="font-medium">
                 {computerProgram.process_number}
               </TableCell>
               <TableCell>{computerProgram.title}</TableCell>
               <TableCell>{computerProgram.title.slice(0, 3)}</TableCell>
-              <TableCell>{computerProgram.situation}</TableCell>
+              <TableCell>{computerProgram.status}</TableCell>
               <TableCell>{computerProgram.depositor}</TableCell>
               <TableCell>
                 {computerProgram.cnpj_depositor ||
@@ -141,6 +179,13 @@ const ComputerProgramsTable = ({
           ))}
         </TableBody>
       </Table>
+
+      <ScrapeConfirmModal
+        open={isOpenScrapeConfirmModal}
+        isLoading={isScrappingStatus}
+        onClose={() => setIsOpenScrapeConfirmModal(false)}
+        onConfirm={() => onScrapeStatus(processIdToScrape || '')}
+      />
 
       <DeleteConfirmModal
         open={isOpenDeleteConfirmModal}
