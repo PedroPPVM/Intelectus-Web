@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
+import { Toaster } from 'sonner';
 
 export default function RootLayout({
   children,
@@ -25,6 +26,8 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               {children}
+
+              <Toaster richColors />
             </ThemeProvider>
           </QueryClientProvider>
         </AuthProvider>

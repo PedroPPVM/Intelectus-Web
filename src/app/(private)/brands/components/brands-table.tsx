@@ -26,6 +26,7 @@ import {
 } from '@/services/Processes/processes';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 import { ScrapeConfirmModal } from '@/components/scrape-confirm-modal';
+import { toast } from 'sonner';
 
 interface BrandsTableProps {
   brands: Process.Entity[];
@@ -60,6 +61,12 @@ const BrandsTable = ({ brands, onOpenBrandModal }: BrandsTableProps) => {
         setProcessIdToScrape(null);
 
         queryClient.invalidateQueries({ queryKey: ['get-brands'] });
+
+        if (data.response === 'Nenhuma atualização necessária.')
+          toast.info(data.response);
+        else if (data.response === 'Processo não encontrado na revista.')
+          toast.error(data.response);
+        else toast.success(data.response);
       },
     });
 

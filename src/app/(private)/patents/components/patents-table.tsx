@@ -26,6 +26,7 @@ import {
   scrapeStatusByProcess,
 } from '@/services/Processes/processes';
 import { ScrapeConfirmModal } from '@/components/scrape-confirm-modal';
+import { toast } from 'sonner';
 
 interface PatentsTableProps {
   patents: Process.Entity[];
@@ -55,11 +56,17 @@ const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
         scrapeStatusByProcess({
           processId: processId,
         }),
-      onSuccess: () => {
+      onSuccess: ({ data }) => {
         setIsOpenScrapeConfirmModal(false);
         setProcessIdToScrape(null);
 
         queryClient.invalidateQueries({ queryKey: ['get-patents'] });
+
+        if (data.response === 'Nenhuma atualização necessária.')
+          toast.info(data.response);
+        else if (data.response === 'Processo não encontrado na revista.')
+          toast.error(data.response);
+        else toast.success(data.response);
       },
     });
 
