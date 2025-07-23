@@ -9,11 +9,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DatePickerField } from './date-picker-field';
 import dayjs from 'dayjs';
+import { IMaskInput } from 'react-imask';
 
 export interface ProcessProps {
   id?: string;
@@ -29,18 +30,33 @@ export interface ProcessProps {
   validity_date: Date;
 }
 
-const processSchema = z.object({
-  process_number: z.string().min(1, 'Informe um número de processo válido.'),
-  title: z.string().min(1, 'Informe o nome da marca.'),
-  situation: z.string().min(1, 'Informe a situação da marca.'),
-  depositor: z.string().min(1, 'Informe o depositante.'),
-  cnpj_depositor: z.string().optional(),
-  cpf_depositor: z.string().optional(),
-  attorney: z.string().min(1, 'Informe o procurador.'),
-  deposit_date: z.string().min(1, 'Informe a data do depósito.'),
-  concession_date: z.string().min(1, 'Informe a data da concessão.'),
-  validity_date: z.string().min(1, 'Informe a vigência.'),
-});
+const processSchema = z
+  .object({
+    process_number: z.string().min(1, 'Informe um número de processo válido.'),
+    title: z.string().min(1, 'Informe o nome da marca.'),
+    situation: z.string().min(1, 'Informe a situação da marca.'),
+    depositor: z.string().min(1, 'Informe o depositante.'),
+    cnpj_depositor: z
+      .string()
+      .optional()
+      .refine((val) => !val || val.length >= 14, {
+        message: 'CNPJ Inválido.',
+      }),
+    cpf_depositor: z
+      .string()
+      .optional()
+      .refine((val) => !val || val.length >= 11, {
+        message: 'CPF Inválido.',
+      }),
+    attorney: z.string().min(1, 'Informe o procurador.'),
+    deposit_date: z.string().min(1, 'Informe a data do depósito.'),
+    concession_date: z.string().min(1, 'Informe a data da concessão.'),
+    validity_date: z.string().min(1, 'Informe a vigência.'),
+  })
+  .refine((data) => data.cpf_depositor || data.cnpj_depositor, {
+    message: 'CNPJ ou CPF deve ser preenchido.',
+    path: ['cnpj_depositor'],
+  });
 
 type ProcessFormSchema = {
   id?: string;
@@ -76,6 +92,7 @@ export function ManageProcessModal({
   const [validity_dateOpen, setValidityDateOpen] = useState(false);
 
   const {
+    control,
     register,
     handleSubmit,
     setValue,
@@ -202,24 +219,52 @@ export function ManageProcessModal({
                 </span>
               )}
             </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">CNPJ</label>
-              <Input {...register('cnpj_depositor')} />
-              {errors.cnpj_depositor && (
-                <span className="text-xs text-red-500">
-                  {errors.cnpj_depositor.message}
-                </span>
+            <Controller
+              control={control}
+              name="cnpj_depositor"
+              render={({ field }) => (
+                <div className="flex flex-col">
+                  <span>CNPJ</span>
+
+                  <IMaskInput
+                    mask="00.000.000/0000-00"
+                    value={field.value}
+                    onAccept={(value: string) => field.onChange(value)}
+                    unmask
+                    className="dark:bg-input/30 border-input focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                  />
+
+                  {errors.cnpj_depositor && (
+                    <span className="text-xs text-red-500">
+                      {errors.cnpj_depositor.message}
+                    </span>
+                  )}
+                </div>
               )}
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">CPF</label>
-              <Input {...register('cpf_depositor')} />
-              {errors.cpf_depositor && (
-                <span className="text-xs text-red-500">
-                  {errors.cpf_depositor.message}
-                </span>
+            />
+            <Controller
+              control={control}
+              name="cpf_depositor"
+              render={({ field }) => (
+                <div className="flex flex-col">
+                  <span>CPF</span>
+
+                  <IMaskInput
+                    mask="000.000.000-00"
+                    value={field.value}
+                    onAccept={(value: string) => field.onChange(value)}
+                    unmask
+                    className="dark:bg-input/30 border-input focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                  />
+
+                  {errors.cpf_depositor && (
+                    <span className="text-xs text-red-500">
+                      {errors.cpf_depositor.message}
+                    </span>
+                  )}
+                </div>
               )}
-            </div>
+            />
             <div>
               <label className="mb-1 block text-sm font-medium">
                 Procurador
