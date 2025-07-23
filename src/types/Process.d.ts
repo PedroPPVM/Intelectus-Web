@@ -3,7 +3,7 @@ namespace Process {
         id?: string;
         process_number: string;
         title: string;
-        situation: string;
+        status: string;
         depositor: string;
         cnpj_depositor: string;
         cpf_depositor: string;
