@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getMe, login } from '@/services/authService/auth';
 import { getCompanies } from '@/services/Companies/companies';
+import { toast } from 'sonner';
 
 interface User {
   company_ids: string[];
@@ -35,6 +36,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(JSON.parse(storedUser));
     }
     setIsLoading(false);
+    toast.error('teste');
   }, []);
 
   const signIn = async (email: string, password: string) => {
