@@ -47,7 +47,7 @@ export const updateProcess = async ({
 
     return response;
   } catch (error) {
-    throw 'Erro ao atualizar processo';
+    throw 'Erro ao atualizar processo.';
   }
 };
 
@@ -65,7 +65,7 @@ export const deleteProcess = async ({
 
     return response;
   } catch (error) {
-    throw 'Erro ao excluir processo!';
+    throw 'Erro ao excluir processo.';
   }
 };
 

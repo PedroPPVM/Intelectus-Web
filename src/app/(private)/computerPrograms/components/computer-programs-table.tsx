@@ -71,6 +71,7 @@ const ComputerProgramsTable = ({
           toast.error(data.response);
         else toast.success(data.response);
       },
+      onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
   const { mutateAsync: onDeleteProcess, isPending: isDeletingProcess } =
@@ -86,6 +87,7 @@ const ComputerProgramsTable = ({
 
         queryClient.invalidateQueries({ queryKey: ['get-computer-programs'] });
       },
+      onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
   const actionsOptions = (computerProgram: Process.Entity) => {

@@ -16,6 +16,7 @@ import {
   updateProcess,
 } from '@/services/Processes/processes';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
+import { toast } from 'sonner';
 
 const Brands = () => {
   const companyByLocalStorage = getSelectedCompany();
@@ -61,6 +62,7 @@ const Brands = () => {
       onSuccess: () => {
         onRefetchBrands();
       },
+      onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
   const { mutateAsync: onUpdateBrand, isPending: isUpdatingProcess } =
@@ -79,6 +81,7 @@ const Brands = () => {
       onSuccess: () => {
         onRefetchBrands();
       },
+      onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
   const handleOpenBrandModal = (brand: Process.Entity) => {

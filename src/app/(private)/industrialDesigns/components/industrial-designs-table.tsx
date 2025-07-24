@@ -71,6 +71,7 @@ const IndustrialDesignsTable = ({
           toast.error(data.response);
         else toast.success(data.response);
       },
+      onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
   const { mutateAsync: onDeleteProcess, isPending: isDeletingProcess } =
@@ -86,6 +87,7 @@ const IndustrialDesignsTable = ({
 
         queryClient.invalidateQueries({ queryKey: ['get-industrial-designs'] });
       },
+      onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
   const actionsOptions = (industrialDesign: Process.Entity) => {

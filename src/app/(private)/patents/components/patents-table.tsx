@@ -68,6 +68,7 @@ const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
           toast.error(data.response);
         else toast.success(data.response);
       },
+      onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
   const { mutateAsync: onDeleteProcess, isPending: isDeletingProcess } =
@@ -83,6 +84,7 @@ const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
 
         queryClient.invalidateQueries({ queryKey: ['get-patents'] });
       },
+      onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
   const actionsOptions = (patent: Process.Entity) => {

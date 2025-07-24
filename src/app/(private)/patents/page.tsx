@@ -16,6 +16,7 @@ import {
   getProcesses,
   updateProcess,
 } from '@/services/Processes/processes';
+import { toast } from 'sonner';
 
 const Patents = () => {
   const companyByLocalStorage = getSelectedCompany();
@@ -61,6 +62,7 @@ const Patents = () => {
       onSuccess: () => {
         onRefetchPatents();
       },
+      onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
   const { mutateAsync: onUpdatePatent, isPending: isUpdatingProcess } =
@@ -79,6 +81,7 @@ const Patents = () => {
       onSuccess: () => {
         onRefetchPatents();
       },
+      onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
   const handleOpenProcessModal = (process: Process.Entity) => {
