@@ -14,10 +14,43 @@ namespace Process {
     company_id: string;
     process_type: string;
   }
+}
 
-  export interface ManageProcessBody {
-    process: Entity;
+namespace ProcessRequest {
+  export interface GetByCompanyId {
     companyId: string;
-    processId?: string;
+    processType: 'BRAND' | 'PATENT' | 'DESIGN' | 'SOFTWARE';
+  }
+
+  export interface GetById {
+    companyId: string;
+    processId: string;
+  }
+
+  export interface CreatePayload {
+    body: Entity;
+    companyId: string;
+  }
+
+  export interface UpdatePayload {
+    body: Entity;
+    companyId: string;
+    processId: string;
+  }
+
+  export interface DeletePayload {
+    companyId: string;
+    processId: string;
+  }
+
+  export interface ScrapingPayload {
+    processId: string;
+  }
+}
+
+namespace ProcessResponse {
+  export interface Scraping {
+    response: string;
+    status: string;
   }
 }

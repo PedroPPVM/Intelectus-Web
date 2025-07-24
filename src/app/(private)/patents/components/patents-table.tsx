@@ -21,10 +21,7 @@ import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
 import { useCallback, useState } from 'react';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  deleteProcess,
-  scrapeStatusByProcess,
-} from '@/services/Processes/processes';
+import { deleteProcess, scrapeStatusByProcess } from '@/services/Processes';
 import { ScrapeConfirmModal } from '@/components/scrape-confirm-modal';
 import { toast } from 'sonner';
 

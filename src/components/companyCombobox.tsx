@@ -19,7 +19,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { useQuery } from '@tanstack/react-query';
-import { getCompanies } from '@/services/Companies/companies';
+import { getCompanies } from '@/services/Companies';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 
 export function CompanyCombobox() {

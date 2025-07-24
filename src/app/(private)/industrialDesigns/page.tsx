@@ -15,7 +15,7 @@ import {
   createProcess,
   getProcesses,
   updateProcess,
-} from '@/services/Processes/processes';
+} from '@/services/Processes';
 import { toast } from 'sonner';
 
 const IndustrialDesigns = () => {
@@ -55,7 +55,7 @@ const IndustrialDesigns = () => {
     mutationFn: async (process: ProcessProps) =>
       createProcess({
         companyId: companyByLocalStorage?.id || '',
-        process: {
+        body: {
           ...process,
           company_id: companyByLocalStorage?.id || '',
           process_type: 'DESIGN',
@@ -75,12 +75,12 @@ const IndustrialDesigns = () => {
     mutationFn: async (process: ProcessProps) =>
       updateProcess({
         companyId: companyByLocalStorage?.id || '',
-        process: {
+        body: {
           ...process,
           company_id: companyByLocalStorage?.id || '',
           process_type: 'DESIGN',
         },
-        processId: process.id,
+        processId: process.id || '',
       }),
     onSuccess: () => {
       onRefetchIndustrialDesigns();

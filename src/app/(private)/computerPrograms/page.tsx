@@ -14,7 +14,7 @@ import {
   createProcess,
   getProcesses,
   updateProcess,
-} from '@/services/Processes/processes';
+} from '@/services/Processes';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -55,7 +55,7 @@ const ComputerPrograms = () => {
     mutationFn: async (process: ProcessProps) =>
       createProcess({
         companyId: companyByLocalStorage?.id || '',
-        process: {
+        body: {
           ...process,
           company_id: companyByLocalStorage?.id || '',
           process_type: 'SOFTWARE',
@@ -73,12 +73,12 @@ const ComputerPrograms = () => {
       mutationFn: async (process: ProcessProps) =>
         updateProcess({
           companyId: companyByLocalStorage?.id || '',
-          process: {
+          body: {
             ...process,
             company_id: companyByLocalStorage?.id || '',
             process_type: 'SOFTWARE',
           },
-          processId: process.id,
+          processId: process.id || '',
         }),
       onSuccess: () => {
         onRefetchComputerPrograms();

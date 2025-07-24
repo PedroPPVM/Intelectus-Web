@@ -14,7 +14,7 @@ import {
   createProcess,
   getProcesses,
   updateProcess,
-} from '@/services/Processes/processes';
+} from '@/services/Processes';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 import { toast } from 'sonner';
 
@@ -53,7 +53,7 @@ const Brands = () => {
       mutationFn: async (process: ProcessProps) =>
         createProcess({
           companyId: companyByLocalStorage?.id || '',
-          process: {
+          body: {
             ...process,
             company_id: companyByLocalStorage?.id || '',
             process_type: 'BRAND',
@@ -71,12 +71,12 @@ const Brands = () => {
       mutationFn: async (process: ProcessProps) =>
         updateProcess({
           companyId: companyByLocalStorage?.id || '',
-          process: {
+          body: {
             ...process,
             company_id: companyByLocalStorage?.id || '',
             process_type: 'BRAND',
           },
-          processId: process.id,
+          processId: process.id || '',
         }),
       onSuccess: () => {
         onRefetchBrands();

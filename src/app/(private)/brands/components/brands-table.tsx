@@ -20,10 +20,7 @@ import dayjs from 'dayjs';
 import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
 import { useCallback, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  deleteProcess,
-  scrapeStatusByProcess,
-} from '@/services/Processes/processes';
+import { deleteProcess, scrapeStatusByProcess } from '@/services/Processes';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 import { ScrapeConfirmModal } from '@/components/scrape-confirm-modal';
 import { toast } from 'sonner';
