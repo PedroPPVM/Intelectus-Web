@@ -7,12 +7,14 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 export default function SignIn() {
   const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { mutateAsync: onSignIn, isPending: isLoadingSignIn } = useMutation({
     mutationKey: ['sign-in'],
@@ -23,6 +25,11 @@ export default function SignIn() {
       email: string;
       password: string;
     }) => await signIn(email, password),
+    onError: (errorMessage: string) => {
+      if (errorMessage === 'Credenciais inválidas')
+        setErrorMessage(errorMessage);
+      else toast.error(errorMessage);
+    },
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -50,7 +57,10 @@ export default function SignIn() {
               type="email"
               placeholder="Email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setErrorMessage(null);
+                setEmail(e.target.value);
+              }}
             />
 
             <div className="relative">
@@ -58,7 +68,10 @@ export default function SignIn() {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Senha"
                 className="pr-10"
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setErrorMessage(null);
+                  setPassword(e.target.value);
+                }}
               />
 
               <button
@@ -68,6 +81,12 @@ export default function SignIn() {
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
+
+              {errorMessage && (
+                <span className="mb-[-20px] flex pt-1 text-xs text-red-500">
+                  {errorMessage}
+                </span>
+              )}
             </div>
 
             <Button
