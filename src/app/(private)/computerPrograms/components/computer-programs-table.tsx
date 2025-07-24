@@ -19,10 +19,7 @@ import { FileSearch2, MoreHorizontal } from 'lucide-react';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
 import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
-import {
-  deleteProcess,
-  scrapeStatusByProcess,
-} from '@/services/Processes/processes';
+import { deleteProcess, scrapeStatusByProcess } from '@/services/Processes';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 import { ScrapeConfirmModal } from '@/components/scrape-confirm-modal';

@@ -2,22 +2,12 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getMe, login } from '@/services/authService/auth';
-import { getCompanies } from '@/services/Companies/companies';
+import { getMe, login } from '@/services/AuthService';
+import { getCompanies } from '@/services/Companies';
 import { toast } from 'sonner';
 
-interface User {
-  company_ids: string[];
-  created_at: Date;
-  email: string;
-  full_name: string;
-  id: string;
-  is_active: boolean;
-  is_superuser: boolean;
-}
-
 interface AuthContextType {
-  user: User | null;
+  user: User.Entity | null;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => void;
   isLoading: boolean;
@@ -26,7 +16,7 @@ interface AuthContextType {
 const AuthContext = createContext({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User.Entity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 

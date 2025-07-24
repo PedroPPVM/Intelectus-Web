@@ -3,12 +3,9 @@ import api from '../api';
 export const getProcesses = async ({
   companyId,
   processType,
-}: {
-  companyId: string;
-  processType: 'BRAND' | 'PATENT' | 'DESIGN' | 'SOFTWARE';
-}) => {
+}: ProcessRequest.GetByCompanyId) => {
   try {
-    const response = await api.get(
+    const response = await api.get<Process.Entity[]>(
       `companies/${companyId}/processes?process_type=${processType}`,
     );
 
@@ -18,14 +15,29 @@ export const getProcesses = async ({
   }
 };
 
+export const getProcessById = async ({
+  companyId,
+  processId,
+}: ProcessRequest.GetById) => {
+  try {
+    const response = await api.get<Process.Entity>(
+      `companies/${companyId}/processes/${processId}`,
+    );
+
+    return response;
+  } catch (error) {
+    throw 'Erro ao requisitar processo.';
+  }
+};
+
 export const createProcess = async ({
   companyId,
-  process,
-}: Process.ManageProcessBody) => {
+  body,
+}: ProcessRequest.CreatePayload) => {
   try {
-    const response = await api.post(
+    const response = await api.post<Process.Entity>(
       `/companies/${companyId}/processes`,
-      process,
+      body,
     );
 
     return response;
@@ -36,13 +48,13 @@ export const createProcess = async ({
 
 export const updateProcess = async ({
   companyId,
-  process,
+  body,
   processId,
-}: Process.ManageProcessBody) => {
+}: ProcessRequest.UpdatePayload) => {
   try {
-    const response = await api.put(
+    const response = await api.put<Process.Entity>(
       `/companies/${companyId}/processes/${processId}`,
-      process,
+      body,
     );
 
     return response;
@@ -54,10 +66,7 @@ export const updateProcess = async ({
 export const deleteProcess = async ({
   companyId,
   processId,
-}: {
-  companyId: string;
-  processId: string;
-}) => {
+}: ProcessRequest.DeletePayload) => {
   try {
     const response = await api.delete(
       `/companies/${companyId}/processes/${processId}`,
@@ -71,11 +80,11 @@ export const deleteProcess = async ({
 
 export const scrapeStatusByProcess = async ({
   processId,
-}: {
-  processId: string;
-}) => {
+}: ProcessRequest.ScrapingPayload) => {
   try {
-    const response = await api.patch(`/processes/${processId}/scrape-status`);
+    const response = await api.patch<ProcessResponse.Scraping>(
+      `/processes/${processId}/scrape-status`,
+    );
 
     return response;
   } catch (error) {
