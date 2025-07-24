@@ -16,6 +16,7 @@ import {
   updateProcess,
 } from '@/services/Processes/processes';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 const ComputerPrograms = () => {
   const companyByLocalStorage = getSelectedCompany();
@@ -63,6 +64,7 @@ const ComputerPrograms = () => {
     onSuccess: () => {
       onRefetchComputerPrograms();
     },
+    onError: (errorMessage: string) => toast.error(errorMessage),
   });
 
   const { mutateAsync: onUpdateComputerProgram, isPending: isUpdatingProcess } =
@@ -81,6 +83,7 @@ const ComputerPrograms = () => {
       onSuccess: () => {
         onRefetchComputerPrograms();
       },
+      onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
   const handleOpenProcessModal = (process: Process.Entity) => {

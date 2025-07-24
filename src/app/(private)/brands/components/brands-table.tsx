@@ -68,6 +68,7 @@ const BrandsTable = ({ brands, onOpenBrandModal }: BrandsTableProps) => {
           toast.error(data.response);
         else toast.success(data.response);
       },
+      onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
   const { mutateAsync: onDeleteProcess, isPending: isDeletingProcess } =
@@ -83,6 +84,7 @@ const BrandsTable = ({ brands, onOpenBrandModal }: BrandsTableProps) => {
 
         queryClient.invalidateQueries({ queryKey: ['get-brands'] });
       },
+      onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
   const actionsOptions = (brand: Process.Entity) => {
