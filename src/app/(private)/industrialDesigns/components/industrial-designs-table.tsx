@@ -124,7 +124,7 @@ const IndustrialDesignsTable = ({
   }, [processIdToDelete]);
 
   return (
-    <div className="max-h-full overflow-auto">
+    <div className="flex max-h-[calc(100vh-224px)] max-w-[calc(100vw-354px)] overflow-auto">
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
