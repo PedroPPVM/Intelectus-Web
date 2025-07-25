@@ -29,6 +29,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 import { EditUserModal } from './edit-user-modal';
+import { usePathname } from 'next/navigation';
 
 const items = [
   {
@@ -55,6 +56,7 @@ const items = [
 
 export function AppSidebar() {
   const { user, signOut } = useAuth();
+  const pathName = usePathname();
 
   const [isOpenEditUserModal, setIsOpenEditUserModal] =
     useState<boolean>(false);
@@ -78,8 +80,18 @@ export function AppSidebar() {
           <SidebarGroupContent className="pt-2">
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                <SidebarMenuItem
+                  key={item.title}
+                  className={
+                    pathName === item.url
+                      ? 'border-r-sidebar-ring border-r-2'
+                      : ''
+                  }
+                >
+                  <SidebarMenuButton
+                    asChild
+                    className={pathName === item.url ? 'bg-sidebar-accent' : ''}
+                  >
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
