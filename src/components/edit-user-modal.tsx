@@ -1,11 +1,13 @@
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from '@/components/ui/dialog';
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
@@ -16,6 +18,7 @@ import { useMutation } from '@tanstack/react-query';
 import { updateUserById } from '@/services/Users';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export interface UserProps {
   id: string;
@@ -80,6 +83,7 @@ export function EditUserModal({
 
       onClose();
     },
+    onError: (errorMessage: string) => toast.error(errorMessage),
   });
 
   function onSubmit(data: UserFormSchema) {
@@ -87,15 +91,15 @@ export function EditUserModal({
   }
 
   return (
-    <Dialog open={open}>
-      <DialogContent>
+    <AlertDialog open={open}>
+      <AlertDialogContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <DialogHeader>
-            <DialogTitle>Editar Usuário</DialogTitle>
-            <DialogDescription>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Editar Usuário</AlertDialogTitle>
+            <AlertDialogDescription>
               Altere os dados para atualizar o usuário
-            </DialogDescription>
-          </DialogHeader>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
@@ -120,22 +124,23 @@ export function EditUserModal({
             </div>
           </div>
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
+          <AlertDialogFooter>
+            <AlertDialogCancel
               onClick={() => onClose()}
               disabled={isUpdatingUser}
             >
               Cancelar
-            </Button>
-            <Button type="submit" disabled={isUpdatingUser || !isDirty}>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              type="submit"
+              disabled={isUpdatingUser || !isDirty}
+            >
               {isUpdatingUser && <Loader2 className="h-4 w-4 animate-spin" />}
               Salvar Alterações
-            </Button>
-          </DialogFooter>
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
