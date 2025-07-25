@@ -17,13 +17,14 @@ import {
 } from '@/components/ui/table';
 import { FileSearch2, MoreHorizontal } from 'lucide-react';
 import dayjs from 'dayjs';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
 import { deleteProcess, scrapeStatusByProcess } from '@/services/Processes';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 import { ScrapeConfirmModal } from '@/components/scrape-confirm-modal';
 import { toast } from 'sonner';
+import { useSidebar } from '@/components/ui/sidebar';
 
 interface ComputerProgramsTableProps {
   computerPrograms: Process.Entity[];
@@ -34,6 +35,12 @@ const ComputerProgramsTable = ({
   computerPrograms,
   onOpenComputerProgramModal,
 }: ComputerProgramsTableProps) => {
+  const { open } = useSidebar();
+
+  const maxTableWidth = useMemo(() => {
+    return open ? 'max-w-[calc(100vw-354px)]' : 'max-w-full';
+  }, [open]);
+
   const companyByLocalStorage = getSelectedCompany();
   const queryClient = useQueryClient();
 
@@ -124,7 +131,9 @@ const ComputerProgramsTable = ({
   }, [processIdToDelete]);
 
   return (
-    <div className="flex max-h-[calc(100vh-224px)] max-w-[calc(100vw-354px)] overflow-auto">
+    <div
+      className={`flex max-h-[calc(100vh-224px)] overflow-auto ${maxTableWidth}`}
+    >
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
