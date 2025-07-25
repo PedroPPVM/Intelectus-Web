@@ -10,6 +10,7 @@ interface AuthContextType {
   user: User.Entity | null;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => void;
+  updateUser: (email: string | null, full_name: string | null) => void;
   isLoading: boolean;
 }
 
@@ -57,6 +58,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const updateUser = (email: string | null, full_name: string | null) => {
+    if (user) {
+      const userUpdated = {
+        ...user,
+        email: email || user?.email,
+        full_name: full_name || user?.full_name,
+      };
+
+      setUser(userUpdated);
+      localStorage.setItem('user', JSON.stringify(userUpdated));
+    }
+  };
+
   const signOut = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -66,7 +80,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, signIn, signOut, isLoading }}>
+    <AuthContext.Provider
+      value={{ user, signIn, signOut, isLoading, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

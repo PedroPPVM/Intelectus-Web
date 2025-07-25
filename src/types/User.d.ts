@@ -19,12 +19,12 @@ declare namespace UserRequest {
   export interface UpdateById {
     userId: string;
     body: {
-      email: string;
-      full_name: string;
-      password: string;
-      is_active: boolean;
-      is_superuser: boolean;
-      company_ids: string[];
+      email?: string;
+      full_name?: string;
+      password?: string;
+      is_active?: boolean;
+      is_superuser?: boolean;
+      company_ids?: string[];
     };
   }
 

@@ -1,7 +1,8 @@
+'use client';
+
 import {
   BookLock,
   ChevronUp,
-  Home,
   Monitor,
   PenTool,
   Store,
@@ -14,7 +15,6 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -27,15 +27,10 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
-import { getLoggedUser } from '@/utils/get-user-by-local-storage';
+import { useState } from 'react';
+import { EditUserModal } from './edit-user-modal';
 
 const items = [
-  // TODO: Tela de Dashboards virá futuramente
-  // {
-  //   title: 'Dashboards',
-  //   url: '/',
-  //   icon: Home,
-  // },
   {
     title: 'Marcas',
     url: '/brands',
@@ -59,14 +54,26 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const { signOut } = useAuth();
-  const { full_name } = getLoggedUser();
+  const { user, signOut } = useAuth();
+
+  const [isOpenEditUserModal, setIsOpenEditUserModal] =
+    useState<boolean>(false);
 
   return (
     <Sidebar>
       <SidebarContent className="pt-1.5">
         <SidebarGroup>
           <CompanyCombobox />
+
+          <EditUserModal
+            open={isOpenEditUserModal}
+            onClose={() => setIsOpenEditUserModal(false)}
+            initialData={
+              user
+                ? { id: user.id, email: user.email, full_name: user.full_name }
+                : { id: '', email: '', full_name: '' }
+            }
+          />
 
           <SidebarGroupContent className="pt-2">
             <SidebarMenu>
@@ -90,7 +97,7 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild className="cursor-pointer">
                 <SidebarMenuButton>
-                  <User2 /> {full_name}
+                  <User2 /> {user?.full_name}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -99,7 +106,10 @@ export function AppSidebar() {
                 align="end"
                 className="flex w-60 flex-col"
               >
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => setIsOpenEditUserModal(true)}
+                >
                   <span>Editar Perfil</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="cursor-pointer">
