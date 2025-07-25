@@ -25,7 +25,7 @@ export const updateUserById = async ({
   body,
 }: UserRequest.UpdateById) => {
   try {
-    const response = await api.put<User.Entity[]>(`/users/${userId}`, body);
+    const response = await api.put<User.Entity>(`/users/${userId}`, body);
 
     return response;
   } catch {
