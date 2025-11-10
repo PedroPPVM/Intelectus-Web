@@ -91,3 +91,18 @@ export const scrapeStatusByProcess = async ({
     throw 'Erro ao realizar leitura da revista.';
   }
 };
+
+export const updateProcessesFromMagazines = async ({
+  companyId,
+  processType,
+}: ProcessRequest.UpdateFromMagazinesPayload) => {
+  try {
+    const response = await api.post<ProcessResponse.UpdateFromMagazines>(
+      `/companies/${companyId}/processes/update-from-magazines/?process_type=${processType}`,
+    );
+
+    return response;
+  } catch (error) {
+    throw 'Erro ao atualizar processos da revista.';
+  }
+};

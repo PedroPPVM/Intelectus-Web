@@ -25,13 +25,19 @@ import { deleteProcess, scrapeStatusByProcess } from '@/services/Processes';
 import { ScrapeConfirmModal } from '@/components/scrape-confirm-modal';
 import { toast } from 'sonner';
 import { useSidebar } from '@/components/ui/sidebar';
+import { SortableTableHeader } from '@/components/sortable-table-header';
 
 interface PatentsTableProps {
   patents: Process.Entity[];
   onOpenPatentsModal: (patent: Process.Entity) => void;
+  sorting: {
+    column: keyof Process.Entity | null;
+    direction: 'asc' | 'desc' | null;
+  };
+  onSort: (column: keyof Process.Entity) => void;
 }
 
-const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
+const PatentsTable = ({ patents, onOpenPatentsModal, sorting, onSort }: PatentsTableProps) => {
   const { open } = useSidebar();
 
   const maxTableWidth = useMemo(() => {
@@ -129,29 +135,72 @@ const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
 
   return (
     <div
-      className={`flex max-h-[calc(100vh-224px)] overflow-auto ${maxTableWidth}`}
+      className={`flex max-h-[calc(100vh-284px)] overflow-auto rounded-lg border ${maxTableWidth}`}
     >
       <Table>
         <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead className="w-[50px]"></TableHead>
-            <TableHead>N° do Processo</TableHead>
-            <TableHead>Título</TableHead>
-            <TableHead>Apelido</TableHead>
-            <TableHead>Situação</TableHead>
-            <TableHead>Depositante</TableHead>
-            <TableHead>CNPJ/CPF</TableHead>
-            <TableHead>Procurador</TableHead>
-            <TableHead>Data do Depósito</TableHead>
-            <TableHead>Data da Concessão</TableHead>
-            <TableHead>Vigência</TableHead>
+          <TableRow className="bg-muted/50 hover:bg-muted/50">
+            <TableHead className="w-[50px] border-r"></TableHead>
+            <SortableTableHeader
+              column="process_number"
+              label="N° do Processo"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <SortableTableHeader
+              column="title"
+              label="Título"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <TableHead className="border-r font-semibold">Apelido</TableHead>
+            <SortableTableHeader
+              column="status"
+              label="Situação"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <SortableTableHeader
+              column="depositor"
+              label="Depositante"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <TableHead className="border-r font-semibold">CNPJ/CPF</TableHead>
+            <TableHead className="border-r font-semibold">Procurador</TableHead>
+            <SortableTableHeader
+              column="deposit_date"
+              label="Data do Depósito"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <SortableTableHeader
+              column="concession_date"
+              label="Data da Concessão"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <SortableTableHeader
+              column="validity_date"
+              label="Vigência"
+              sorting={sorting}
+              onSort={onSort}
+            />
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
+          {patents.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={10} className="text-center py-4">
+                Nenhuma patente encontrada.
+              </TableCell>
+            </TableRow>
+          )}
+          
           {patents.map((patent) => (
-            <TableRow key={patent.id} className="hover:bg-transparent">
-              <TableCell>
+            <TableRow key={patent.id} className="hover:bg-muted/30">
+              <TableCell className="border-r py-4">
                 <button
                   type="button"
                   className="hover:bg-muted cursor-pointer rounded-full p-2 transition-all"
@@ -163,27 +212,27 @@ const PatentsTable = ({ patents, onOpenPatentsModal }: PatentsTableProps) => {
                   <FileSearch2 />
                 </button>
               </TableCell>
-              <TableCell className="font-medium">
+              <TableCell className="border-r font-medium py-4">
                 {patent.process_number}
               </TableCell>
-              <TableCell>{patent.title}</TableCell>
-              <TableCell>{patent.title.slice(0, 3)}</TableCell>
-              <TableCell>{patent.status}</TableCell>
-              <TableCell>{patent.depositor}</TableCell>
-              <TableCell>
+              <TableCell className="border-r py-4">{patent.title}</TableCell>
+              <TableCell className="border-r py-4">{patent.title.slice(0, 3)}</TableCell>
+              <TableCell className="border-r py-4">{patent.status}</TableCell>
+              <TableCell className="border-r py-4">{patent.depositor}</TableCell>
+              <TableCell className="border-r py-4">
                 {patent.cnpj_depositor || patent.cpf_depositor}
               </TableCell>
-              <TableCell>{patent.attorney}</TableCell>
-              <TableCell>
+              <TableCell className="border-r py-4">{patent.attorney}</TableCell>
+              <TableCell className="border-r py-4">
                 {dayjs(patent.deposit_date).format('DD/MM/YYYY')}
               </TableCell>
-              <TableCell>
+              <TableCell className="border-r py-4">
                 {dayjs(patent.concession_date).format('DD/MM/YYYY')}
               </TableCell>
-              <TableCell>
+              <TableCell className="border-r py-4">
                 {dayjs(patent.validity_date).format('DD/MM/YYYY')}
               </TableCell>
-              <TableCell className="w-[50px]">
+              <TableCell className="w-[50px] py-4">
                 {actionsOptions(patent)}
               </TableCell>
             </TableRow>

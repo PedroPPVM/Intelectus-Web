@@ -32,10 +32,10 @@ export interface ProcessProps {
 
 const processSchema = z
   .object({
-    process_number: z.string().min(1, 'Informe um número de processo válido.'),
-    title: z.string().min(1, 'Informe o nome da marca.'),
-    status: z.string().min(1, 'Informe o status da marca.'),
-    depositor: z.string().min(1, 'Informe o depositante.'),
+    process_number: z.string().min(5, 'Informe um número de processo com no mínimo 5 caracteres.').trim(),
+    title: z.string().min(1, 'Informe o nome da marca.').trim(),
+    status: z.string().min(1, 'Informe o status da marca.').trim(),
+    depositor: z.string().min(1, 'Informe o depositante.').trim(),
     cnpj_depositor: z
       .string()
       .optional()
@@ -48,7 +48,7 @@ const processSchema = z
       .refine((val) => !val || val.length >= 11, {
         message: 'CPF Inválido.',
       }),
-    attorney: z.string().min(1, 'Informe o procurador.'),
+    attorney: z.string().min(1, 'Informe o procurador.').trim(),
     deposit_date: z.string().min(1, 'Informe a data do depósito.'),
     concession_date: z.string().min(1, 'Informe a data da concessão.'),
     validity_date: z.string().min(1, 'Informe a vigência.'),
@@ -160,7 +160,6 @@ export function ManageProcessModal({
       concession_date: new Date(data.concession_date),
       validity_date: new Date(data.validity_date),
     });
-    onOpenChange(false);
   }
 
   return (

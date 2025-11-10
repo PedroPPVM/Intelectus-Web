@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Plus } from 'lucide-react';
+import { Plus, RefreshCw, SearchIcon } from 'lucide-react';
 import PatentsTable from './components/patents-table';
 import {
   ManageProcessModal,
@@ -15,8 +15,11 @@ import {
   createProcess,
   getProcesses,
   updateProcess,
+  updateProcessesFromMagazines,
 } from '@/services/Processes';
 import { toast } from 'sonner';
+import { useTableState } from '@/hooks/useTableState';
+import { TablePagination } from '@/components/table-pagination';
 
 const Patents = () => {
   const companyByLocalStorage = getSelectedCompany();
@@ -27,6 +30,8 @@ const Patents = () => {
   const [selectedProcess, setSelectedProcess] = useState<
     Process.Entity | undefined
   >(undefined);
+
+  const [search, setSearch] = useState<string>('');
 
   const {
     data: patentsResult,
@@ -46,6 +51,22 @@ const Patents = () => {
 
     return patentsResult.data;
   }, [patentsResult]);
+
+  const filteredPatents = useMemo(() => {
+    return patents.filter((patent) => patent.process_number.toLowerCase().includes(search.toLowerCase()));
+  }, [patents, search]);
+
+  const {
+    processedData,
+    sorting,
+    pagination,
+    handleSort,
+    handlePageChange,
+    handleItemsPerPageChange,
+  } = useTableState({
+    data: filteredPatents,
+    initialItemsPerPage: 25,
+  });
 
   const { mutateAsync: onCreatePatent, isPending: isCreatingProcess } =
     useMutation({
@@ -84,6 +105,23 @@ const Patents = () => {
       onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
+  const { mutateAsync: onUpdateFromMagazines, isPending: isUpdatingFromMagazines } =
+    useMutation({
+      mutationKey: ['update-patents-from-magazines'],
+      mutationFn: async () =>
+        updateProcessesFromMagazines({
+          companyId: companyByLocalStorage?.id || '',
+          processType: 'PATENT',
+        }),
+      onSuccess: (response) => {
+        onRefetchPatents();
+        toast.success(
+          `Atualização concluída! ${response.data.updated_processes} de ${response.data.total_processes} processos atualizados.`,
+        );
+      },
+      onError: (errorMessage: string) => toast.error(errorMessage),
+    });
+
   const handleOpenProcessModal = (process: Process.Entity) => {
     setManageProcessMode('edit');
     setIsOpenProcessModal(true);
@@ -105,24 +143,57 @@ const Patents = () => {
       <CardHeader className="flex flex-wrap items-center justify-between">
         <span className="text-2xl font-bold">Patentes</span>
 
-        <div className="flex flex-wrap items-center gap-4">
-          <Button
-            onClick={() => {
-              setManageProcessMode('create');
-              setIsOpenProcessModal(true);
-              setSelectedProcess(undefined);
-            }}
+        <div className="flex gap-4">
+          <div 
+            className="flex gap-2 w-full min-w-[310px] h-9 max-w-sm rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Plus /> Criar Patente
-          </Button>
+            <SearchIcon className="size-4" />
+            <input
+              type="text"
+              className='w-full border-none outline-none'
+              placeholder="Buscar patente pelo número do processo"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={() => onUpdateFromMagazines()}
+              disabled={isUpdatingFromMagazines}
+            >
+              <RefreshCw className={isUpdatingFromMagazines ? 'animate-spin' : ''} />
+              {isUpdatingFromMagazines ? 'Atualizando...' : 'Atualizar Todas'}
+            </Button>
+            <Button
+              onClick={() => {
+                setManageProcessMode('create');
+                setIsOpenProcessModal(true);
+                setSelectedProcess(undefined);
+              }}
+            >
+              <Plus /> Criar Patente
+            </Button>
+          </div>
         </div>
+        
       </CardHeader>
 
       <CardContent>
         <div className="hidden md:block">
           <PatentsTable
-            patents={patents}
+            patents={processedData.data}
             onOpenPatentsModal={handleOpenProcessModal}
+            sorting={sorting}
+            onSort={handleSort}
+          />
+          <TablePagination
+            currentPage={pagination.currentPage}
+            totalPages={processedData.totalPages}
+            itemsPerPage={pagination.itemsPerPage}
+            totalItems={processedData.totalItems}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
           />
         </div>
       </CardContent>
