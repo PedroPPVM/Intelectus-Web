@@ -25,15 +25,23 @@ import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 import { ScrapeConfirmModal } from '@/components/scrape-confirm-modal';
 import { toast } from 'sonner';
 import { useSidebar } from '@/components/ui/sidebar';
+import { SortableTableHeader } from '@/components/sortable-table-header';
 
 interface ComputerProgramsTableProps {
   computerPrograms: Process.Entity[];
   onOpenComputerProgramModal: (computerProgram: Process.Entity) => void;
+  sorting: {
+    column: keyof Process.Entity | null;
+    direction: 'asc' | 'desc' | null;
+  };
+  onSort: (column: keyof Process.Entity) => void;
 }
 
 const ComputerProgramsTable = ({
   computerPrograms,
   onOpenComputerProgramModal,
+  sorting,
+  onSort,
 }: ComputerProgramsTableProps) => {
   const { open } = useSidebar();
 
@@ -132,29 +140,72 @@ const ComputerProgramsTable = ({
 
   return (
     <div
-      className={`flex max-h-[calc(100vh-224px)] overflow-auto ${maxTableWidth}`}
+      className={`flex max-h-[calc(100vh-284px)] overflow-auto rounded-lg border ${maxTableWidth}`}
     >
       <Table>
         <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead className="w-[50px]"></TableHead>
-            <TableHead>N° do Processo</TableHead>
-            <TableHead>Título</TableHead>
-            <TableHead>Apelido</TableHead>
-            <TableHead>Situação</TableHead>
-            <TableHead>Depositante</TableHead>
-            <TableHead>CNPJ/CPF</TableHead>
-            <TableHead>Procurador</TableHead>
-            <TableHead>Data do Depósito</TableHead>
-            <TableHead>Data da Concessão</TableHead>
-            <TableHead>Vigência</TableHead>
+          <TableRow className="bg-muted/50 hover:bg-muted/50">
+            <TableHead className="w-[50px] border-r"></TableHead>
+            <SortableTableHeader
+              column="process_number"
+              label="N° do Processo"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <SortableTableHeader
+              column="title"
+              label="Título"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <TableHead className="border-r font-semibold">Apelido</TableHead>
+            <SortableTableHeader
+              column="status"
+              label="Situação"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <SortableTableHeader
+              column="depositor"
+              label="Depositante"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <TableHead className="border-r font-semibold">CNPJ/CPF</TableHead>
+            <TableHead className="border-r font-semibold">Procurador</TableHead>
+            <SortableTableHeader
+              column="deposit_date"
+              label="Data do Depósito"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <SortableTableHeader
+              column="concession_date"
+              label="Data da Concessão"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <SortableTableHeader
+              column="validity_date"
+              label="Vigência"
+              sorting={sorting}
+              onSort={onSort}
+            />
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
+          {computerPrograms.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={10} className="text-center py-4">
+                Nenhuma programa de computador encontrado.
+              </TableCell>
+            </TableRow>
+          )}
+          
           {computerPrograms.map((computerProgram) => (
-            <TableRow key={computerProgram.id} className="hover:bg-transparent">
-              <TableCell>
+            <TableRow key={computerProgram.id} className="hover:bg-muted/30">
+              <TableCell className="border-r py-4">
                 <button
                   type="button"
                   className="hover:bg-muted cursor-pointer rounded-full p-2 transition-all"
@@ -166,28 +217,28 @@ const ComputerProgramsTable = ({
                   <FileSearch2 />
                 </button>
               </TableCell>
-              <TableCell className="font-medium">
+              <TableCell className="border-r font-medium py-4">
                 {computerProgram.process_number}
               </TableCell>
-              <TableCell>{computerProgram.title}</TableCell>
-              <TableCell>{computerProgram.title.slice(0, 3)}</TableCell>
-              <TableCell>{computerProgram.status}</TableCell>
-              <TableCell>{computerProgram.depositor}</TableCell>
-              <TableCell>
+              <TableCell className="border-r py-4">{computerProgram.title}</TableCell>
+              <TableCell className="border-r py-4">{computerProgram.title.slice(0, 3)}</TableCell>
+              <TableCell className="border-r py-4">{computerProgram.status}</TableCell>
+              <TableCell className="border-r py-4">{computerProgram.depositor}</TableCell>
+              <TableCell className="border-r py-4">
                 {computerProgram.cnpj_depositor ||
                   computerProgram.cpf_depositor}
               </TableCell>
-              <TableCell>{computerProgram.attorney}</TableCell>
-              <TableCell>
+              <TableCell className="border-r py-4">{computerProgram.attorney}</TableCell>
+              <TableCell className="border-r py-4">
                 {dayjs(computerProgram.deposit_date).format('DD/MM/YYYY')}
               </TableCell>
-              <TableCell>
+              <TableCell className="border-r py-4">
                 {dayjs(computerProgram.concession_date).format('DD/MM/YYYY')}
               </TableCell>
-              <TableCell>
+              <TableCell className="border-r py-4">
                 {dayjs(computerProgram.validity_date).format('DD/MM/YYYY')}
               </TableCell>
-              <TableCell className="w-[50px]">
+              <TableCell className="w-[50px] py-4">
                 {actionsOptions(computerProgram)}
               </TableCell>
             </TableRow>
