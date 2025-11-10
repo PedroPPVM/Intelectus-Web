@@ -15,14 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { FileSearch2, MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
 import dayjs from 'dayjs';
 import { useCallback, useMemo, useState } from 'react';
 import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
 import { deleteProcess, scrapeStatusByProcess } from '@/services/Processes';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
-import { ScrapeConfirmModal } from '@/components/scrape-confirm-modal';
 import { toast } from 'sonner';
 import { useSidebar } from '@/components/ui/sidebar';
 import { SortableTableHeader } from '@/components/sortable-table-header';
@@ -52,39 +51,22 @@ const ComputerProgramsTable = ({
   const companyByLocalStorage = getSelectedCompany();
   const queryClient = useQueryClient();
 
-  const [isOpenScrapeConfirmModal, setIsOpenScrapeConfirmModal] =
-    useState<boolean>(false);
-  const [processIdToScrape, setProcessIdToScrape] = useState<string | null>(
-    null,
-  );
-
   const [isOpenDeleteConfirmModal, setIsOpenDeleteConfirmModal] =
     useState<boolean>(false);
   const [processIdToDelete, setProcessIdToDelete] = useState<string | null>(
     null,
   );
 
-  const { mutateAsync: onScrapeStatus, isPending: isScrappingStatus } =
-    useMutation({
-      mutationKey: ['scrape-status-by-process'],
-      mutationFn: async (processId: string) =>
-        scrapeStatusByProcess({
-          processId: processId,
-        }),
-      onSuccess: ({ data }) => {
-        setIsOpenScrapeConfirmModal(false);
-        setProcessIdToScrape(null);
-
-        queryClient.invalidateQueries({ queryKey: ['get-computer-programs'] });
-
-        if (data.response === 'Nenhuma atualização necessária.')
-          toast.info(data.response);
-        else if (data.response === 'Processo não encontrado na revista.')
-          toast.error(data.response);
-        else toast.success(data.response);
-      },
-      onError: (errorMessage: string) => toast.error(errorMessage),
-    });
+  const { mutateAsync: onScrapeStatus } = useMutation({
+    mutationKey: ['scrape-status-by-process'],
+    mutationFn: async (processId: string) =>
+      scrapeStatusByProcess({
+        processId: processId,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['get-computer-programs'] });
+    },
+  });
 
   const { mutateAsync: onDeleteProcess, isPending: isDeletingProcess } =
     useMutation({
@@ -102,6 +84,22 @@ const ComputerProgramsTable = ({
       onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
+  const handleScrapeStatus = async (processId: string) => {
+    toast.promise(onScrapeStatus(processId), {
+      loading: 'Atualizando processo...',
+      success: (response) => {
+        const data = response.data;
+        if (data.response === 'Nenhuma atualização necessária.') {
+          return data.response;
+        } else if (data.response === 'Processo não encontrado na revista.') {
+          throw new Error(data.response);
+        }
+        return data.response;
+      },
+      error: (err) => err.message || 'Erro ao atualizar processo',
+    });
+  };
+
   const actionsOptions = (computerProgram: Process.Entity) => {
     return (
       <DropdownMenu>
@@ -117,6 +115,12 @@ const ComputerProgramsTable = ({
             onClick={() => onOpenComputerProgramModal(computerProgram)}
           >
             Editar
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => handleScrapeStatus(computerProgram.id || '')}
+            className="cursor-pointer"
+          >
+            Atualizar
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
@@ -145,7 +149,6 @@ const ComputerProgramsTable = ({
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
-            <TableHead className="w-[50px] border-r"></TableHead>
             <SortableTableHeader
               column="process_number"
               label="N° do Processo"
@@ -197,38 +200,36 @@ const ComputerProgramsTable = ({
         <TableBody>
           {computerPrograms.length === 0 && (
             <TableRow>
-              <TableCell colSpan={10} className="text-center py-4">
+              <TableCell colSpan={9} className="py-4 text-center">
                 Nenhuma programa de computador encontrado.
               </TableCell>
             </TableRow>
           )}
-          
+
           {computerPrograms.map((computerProgram) => (
             <TableRow key={computerProgram.id} className="hover:bg-muted/30">
-              <TableCell className="border-r py-4">
-                <button
-                  type="button"
-                  className="hover:bg-muted cursor-pointer rounded-full p-2 transition-all"
-                  onClick={() => {
-                    setProcessIdToScrape(computerProgram?.id || '');
-                    setIsOpenScrapeConfirmModal(true);
-                  }}
-                >
-                  <FileSearch2 />
-                </button>
-              </TableCell>
-              <TableCell className="border-r font-medium py-4">
+              <TableCell className="border-r py-4 font-medium">
                 {computerProgram.process_number}
               </TableCell>
-              <TableCell className="border-r py-4">{computerProgram.title}</TableCell>
-              <TableCell className="border-r py-4">{computerProgram.title.slice(0, 3)}</TableCell>
-              <TableCell className="border-r py-4">{computerProgram.status}</TableCell>
-              <TableCell className="border-r py-4">{computerProgram.depositor}</TableCell>
+              <TableCell className="border-r py-4">
+                {computerProgram.title}
+              </TableCell>
+              <TableCell className="border-r py-4">
+                {computerProgram.title.slice(0, 3)}
+              </TableCell>
+              <TableCell className="border-r py-4">
+                {computerProgram.status}
+              </TableCell>
+              <TableCell className="border-r py-4">
+                {computerProgram.depositor}
+              </TableCell>
               <TableCell className="border-r py-4">
                 {computerProgram.cnpj_depositor ||
                   computerProgram.cpf_depositor}
               </TableCell>
-              <TableCell className="border-r py-4">{computerProgram.attorney}</TableCell>
+              <TableCell className="border-r py-4">
+                {computerProgram.attorney}
+              </TableCell>
               <TableCell className="border-r py-4">
                 {dayjs(computerProgram.deposit_date).format('DD/MM/YYYY')}
               </TableCell>
@@ -245,13 +246,6 @@ const ComputerProgramsTable = ({
           ))}
         </TableBody>
       </Table>
-
-      <ScrapeConfirmModal
-        open={isOpenScrapeConfirmModal}
-        isLoading={isScrappingStatus}
-        onClose={() => setIsOpenScrapeConfirmModal(false)}
-        onConfirm={() => onScrapeStatus(processIdToScrape || '')}
-      />
 
       <DeleteConfirmModal
         open={isOpenDeleteConfirmModal}
