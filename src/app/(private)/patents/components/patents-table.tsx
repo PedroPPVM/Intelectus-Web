@@ -15,14 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { FileSearch2, MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
 import dayjs from 'dayjs';
 import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
 import { useCallback, useMemo, useState } from 'react';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteProcess, scrapeStatusByProcess } from '@/services/Processes';
-import { ScrapeConfirmModal } from '@/components/scrape-confirm-modal';
 import { toast } from 'sonner';
 import { useSidebar } from '@/components/ui/sidebar';
 import { SortableTableHeader } from '@/components/sortable-table-header';
@@ -37,7 +36,12 @@ interface PatentsTableProps {
   onSort: (column: keyof Process.Entity) => void;
 }
 
-const PatentsTable = ({ patents, onOpenPatentsModal, sorting, onSort }: PatentsTableProps) => {
+const PatentsTable = ({
+  patents,
+  onOpenPatentsModal,
+  sorting,
+  onSort,
+}: PatentsTableProps) => {
   const { open } = useSidebar();
 
   const maxTableWidth = useMemo(() => {
@@ -47,39 +51,22 @@ const PatentsTable = ({ patents, onOpenPatentsModal, sorting, onSort }: PatentsT
   const companyByLocalStorage = getSelectedCompany();
   const queryClient = useQueryClient();
 
-  const [isOpenScrapeConfirmModal, setIsOpenScrapeConfirmModal] =
-    useState<boolean>(false);
-  const [processIdToScrape, setProcessIdToScrape] = useState<string | null>(
-    null,
-  );
-
   const [isOpenDeleteConfirmModal, setIsOpenDeleteConfirmModal] =
     useState<boolean>(false);
   const [processIdToDelete, setProcessIdToDelete] = useState<string | null>(
     null,
   );
 
-  const { mutateAsync: onScrapeStatus, isPending: isScrappingStatus } =
-    useMutation({
-      mutationKey: ['scrape-status-by-process'],
-      mutationFn: async (processId: string) =>
-        scrapeStatusByProcess({
-          processId: processId,
-        }),
-      onSuccess: ({ data }) => {
-        setIsOpenScrapeConfirmModal(false);
-        setProcessIdToScrape(null);
-
-        queryClient.invalidateQueries({ queryKey: ['get-patents'] });
-
-        if (data.response === 'Nenhuma atualização necessária.')
-          toast.info(data.response);
-        else if (data.response === 'Processo não encontrado na revista.')
-          toast.error(data.response);
-        else toast.success(data.response);
-      },
-      onError: (errorMessage: string) => toast.error(errorMessage),
-    });
+  const { mutateAsync: onScrapeStatus } = useMutation({
+    mutationKey: ['scrape-status-by-process'],
+    mutationFn: async (processId: string) =>
+      scrapeStatusByProcess({
+        processId: processId,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['get-patents'] });
+    },
+  });
 
   const { mutateAsync: onDeleteProcess, isPending: isDeletingProcess } =
     useMutation({
@@ -97,6 +84,22 @@ const PatentsTable = ({ patents, onOpenPatentsModal, sorting, onSort }: PatentsT
       onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
+  const handleScrapeStatus = async (processId: string) => {
+    toast.promise(onScrapeStatus(processId), {
+      loading: 'Atualizando processo...',
+      success: (response) => {
+        const data = response.data;
+        if (data.response === 'Nenhuma atualização necessária.') {
+          return data.response;
+        } else if (data.response === 'Processo não encontrado na revista.') {
+          throw new Error(data.response);
+        }
+        return data.response;
+      },
+      error: (err) => err.message || 'Erro ao atualizar processo',
+    });
+  };
+
   const actionsOptions = (patent: Process.Entity) => {
     return (
       <DropdownMenu>
@@ -112,6 +115,12 @@ const PatentsTable = ({ patents, onOpenPatentsModal, sorting, onSort }: PatentsT
             onClick={() => onOpenPatentsModal(patent)}
           >
             Editar
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => handleScrapeStatus(patent.id || '')}
+            className="cursor-pointer"
+          >
+            Atualizar
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
@@ -140,7 +149,6 @@ const PatentsTable = ({ patents, onOpenPatentsModal, sorting, onSort }: PatentsT
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
-            <TableHead className="w-[50px] border-r"></TableHead>
             <SortableTableHeader
               column="process_number"
               label="N° do Processo"
@@ -192,33 +200,25 @@ const PatentsTable = ({ patents, onOpenPatentsModal, sorting, onSort }: PatentsT
         <TableBody>
           {patents.length === 0 && (
             <TableRow>
-              <TableCell colSpan={10} className="text-center py-4">
+              <TableCell colSpan={9} className="py-4 text-center">
                 Nenhuma patente encontrada.
               </TableCell>
             </TableRow>
           )}
-          
+
           {patents.map((patent) => (
             <TableRow key={patent.id} className="hover:bg-muted/30">
-              <TableCell className="border-r py-4">
-                <button
-                  type="button"
-                  className="hover:bg-muted cursor-pointer rounded-full p-2 transition-all"
-                  onClick={() => {
-                    setProcessIdToScrape(patent?.id || '');
-                    setIsOpenScrapeConfirmModal(true);
-                  }}
-                >
-                  <FileSearch2 />
-                </button>
-              </TableCell>
-              <TableCell className="border-r font-medium py-4">
+              <TableCell className="border-r py-4 font-medium">
                 {patent.process_number}
               </TableCell>
               <TableCell className="border-r py-4">{patent.title}</TableCell>
-              <TableCell className="border-r py-4">{patent.title.slice(0, 3)}</TableCell>
+              <TableCell className="border-r py-4">
+                {patent.title.slice(0, 3)}
+              </TableCell>
               <TableCell className="border-r py-4">{patent.status}</TableCell>
-              <TableCell className="border-r py-4">{patent.depositor}</TableCell>
+              <TableCell className="border-r py-4">
+                {patent.depositor}
+              </TableCell>
               <TableCell className="border-r py-4">
                 {patent.cnpj_depositor || patent.cpf_depositor}
               </TableCell>
@@ -239,13 +239,6 @@ const PatentsTable = ({ patents, onOpenPatentsModal, sorting, onSort }: PatentsT
           ))}
         </TableBody>
       </Table>
-
-      <ScrapeConfirmModal
-        open={isOpenScrapeConfirmModal}
-        isLoading={isScrappingStatus}
-        onClose={() => setIsOpenScrapeConfirmModal(false)}
-        onConfirm={() => onScrapeStatus(processIdToScrape || '')}
-      />
 
       <DeleteConfirmModal
         open={isOpenDeleteConfirmModal}
