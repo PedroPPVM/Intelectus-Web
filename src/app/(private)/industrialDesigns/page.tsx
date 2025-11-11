@@ -10,7 +10,7 @@ import {
 } from '@/components/manage-process-modal';
 import { useCallback, useMemo, useState } from 'react';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createProcess,
   getProcesses,
@@ -22,6 +22,7 @@ import { useTableState } from '@/hooks/useTableState';
 import { TablePagination } from '@/components/table-pagination';
 
 const IndustrialDesigns = () => {
+  const queryClient = useQueryClient();
   const companyByLocalStorage = getSelectedCompany();
   const [isOpenProcessModal, setIsOpenProcessModal] = useState(false);
   const [manageProcessMode, setManageProcessMode] = useState<'create' | 'edit'>(
@@ -84,6 +85,7 @@ const IndustrialDesigns = () => {
       }),
     onSuccess: () => {
       onRefetchIndustrialDesigns();
+      queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
     },
     onError: (errorMessage: string) => toast.error(errorMessage),
   });
@@ -105,6 +107,7 @@ const IndustrialDesigns = () => {
       }),
     onSuccess: () => {
       onRefetchIndustrialDesigns();
+      queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
     },
     onError: (errorMessage: string) => toast.error(errorMessage),
   });
@@ -119,6 +122,7 @@ const IndustrialDesigns = () => {
         }),
       onSuccess: (response) => {
         onRefetchIndustrialDesigns();
+        queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
         toast.success(
           `Atualização concluída! ${response.data.updated_processes} de ${response.data.total_processes} processos atualizados.`,
         );

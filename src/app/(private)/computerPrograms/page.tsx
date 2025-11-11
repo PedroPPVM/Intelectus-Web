@@ -16,12 +16,13 @@ import {
   updateProcess,
   updateProcessesFromMagazines,
 } from '@/services/Processes';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useTableState } from '@/hooks/useTableState';
 import { TablePagination } from '@/components/table-pagination';
 
 const ComputerPrograms = () => {
+  const queryClient = useQueryClient();
   const companyByLocalStorage = getSelectedCompany();
   const [isOpenProcessModal, setIsOpenProcessModal] = useState(false);
   const [manageProcessMode, setManageProcessMode] = useState<'create' | 'edit'>(
@@ -84,6 +85,7 @@ const ComputerPrograms = () => {
       }),
     onSuccess: () => {
       onRefetchComputerPrograms();
+      queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
     },
     onError: (errorMessage: string) => toast.error(errorMessage),
   });
@@ -103,6 +105,7 @@ const ComputerPrograms = () => {
         }),
       onSuccess: () => {
         onRefetchComputerPrograms();
+        queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
       },
       onError: (errorMessage: string) => toast.error(errorMessage),
     });
@@ -117,6 +120,7 @@ const ComputerPrograms = () => {
         }),
       onSuccess: (response) => {
         onRefetchComputerPrograms();
+        queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
         toast.success(
           `Atualização concluída! ${response.data.updated_processes} de ${response.data.total_processes} processos atualizados.`,
         );

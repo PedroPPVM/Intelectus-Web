@@ -65,6 +65,7 @@ const IndustrialDesignsTable = ({
       }),
     onSuccess: ({ data }) => {
       queryClient.invalidateQueries({ queryKey: ['get-industrial-designs'] });
+      queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
     },
   });
 
@@ -80,6 +81,7 @@ const IndustrialDesignsTable = ({
         setProcessIdToDelete(null);
 
         queryClient.invalidateQueries({ queryKey: ['get-industrial-designs'] });
+        queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
       },
       onError: (errorMessage: string) => toast.error(errorMessage),
     });

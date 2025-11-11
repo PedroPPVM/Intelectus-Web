@@ -65,6 +65,7 @@ const ComputerProgramsTable = ({
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['get-computer-programs'] });
+      queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
     },
   });
 
@@ -80,6 +81,7 @@ const ComputerProgramsTable = ({
         setProcessIdToDelete(null);
 
         queryClient.invalidateQueries({ queryKey: ['get-computer-programs'] });
+        queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
       },
       onError: (errorMessage: string) => toast.error(errorMessage),
     });
