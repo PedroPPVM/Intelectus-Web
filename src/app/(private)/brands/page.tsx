@@ -9,7 +9,7 @@ import {
   ManageProcessModal,
   ProcessProps,
 } from '@/components/manage-process-modal';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createProcess,
   getProcesses,
@@ -22,6 +22,7 @@ import { useTableState } from '@/hooks/useTableState';
 import { TablePagination } from '@/components/table-pagination';
 
 const Brands = () => {
+  const queryClient = useQueryClient();
   const companyByLocalStorage = getSelectedCompany();
   const [manageBrandMode, setManageBrandMode] = useState<'create' | 'edit'>(
     'create',
@@ -53,7 +54,9 @@ const Brands = () => {
   }, [brandsResult]);
 
   const filteredBrands = useMemo(() => {
-    return brands.filter((brand) => brand.process_number.toLowerCase().includes(search.toLowerCase()));
+    return brands.filter((brand) =>
+      brand.process_number.toLowerCase().includes(search.toLowerCase()),
+    );
   }, [brands, search]);
 
   const {
@@ -82,6 +85,7 @@ const Brands = () => {
         }),
       onSuccess: () => {
         onRefetchBrands();
+        queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
         setIsOpenBrandModal(false);
       },
       onError: (errorMessage: string) => toast.error(errorMessage),
@@ -102,27 +106,31 @@ const Brands = () => {
         }),
       onSuccess: () => {
         onRefetchBrands();
+        queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
         setIsOpenBrandModal(false);
       },
       onError: (errorMessage: string) => toast.error(errorMessage),
     });
 
-  const { mutateAsync: onUpdateFromMagazines, isPending: isUpdatingFromMagazines } =
-    useMutation({
-      mutationKey: ['update-brands-from-magazines'],
-      mutationFn: async () =>
-        updateProcessesFromMagazines({
-          companyId: companyByLocalStorage?.id || '',
-          processType: 'BRAND',
-        }),
-      onSuccess: (response) => {
-        onRefetchBrands();
-        toast.success(
-          `Atualização concluída! ${response.data.updated_processes} de ${response.data.total_processes} processos atualizados.`,
-        );
-      },
-      onError: (errorMessage: string) => toast.error(errorMessage),
-    });
+  const {
+    mutateAsync: onUpdateFromMagazines,
+    isPending: isUpdatingFromMagazines,
+  } = useMutation({
+    mutationKey: ['update-brands-from-magazines'],
+    mutationFn: async () =>
+      updateProcessesFromMagazines({
+        companyId: companyByLocalStorage?.id || '',
+        processType: 'BRAND',
+      }),
+    onSuccess: (response) => {
+      onRefetchBrands();
+      queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
+      toast.success(
+        `Atualização concluída! ${response.data.updated_processes} de ${response.data.total_processes} processos atualizados.`,
+      );
+    },
+    onError: (errorMessage: string) => toast.error(errorMessage),
+  });
 
   const handleOpenBrandModal = (brand: Process.Entity) => {
     setManageBrandMode('edit');
@@ -144,28 +152,28 @@ const Brands = () => {
         <span className="text-2xl font-bold">Marcas</span>
 
         <div className="flex gap-4">
-          <div 
-            className="flex gap-2 w-full min-w-[300px] h-9 max-w-sm rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          <div className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full max-w-sm min-w-[300px] gap-2 rounded-md border px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50">
             <SearchIcon className="size-4" />
             <input
               type="text"
-              className='w-full border-none outline-none'
+              className="w-full border-none outline-none"
               placeholder="Buscar marca pelo número do processo"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          
+
           <div className="flex items-center gap-4">
             <Button
               onClick={() => onUpdateFromMagazines()}
               disabled={isUpdatingFromMagazines}
             >
-              <RefreshCw className={isUpdatingFromMagazines ? 'animate-spin' : ''} />
+              <RefreshCw
+                className={isUpdatingFromMagazines ? 'animate-spin' : ''}
+              />
               {isUpdatingFromMagazines ? 'Atualizando...' : 'Atualizar Todas'}
             </Button>
-            
+
             <Button
               onClick={() => {
                 setManageBrandMode('create');

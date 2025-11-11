@@ -65,6 +65,7 @@ const PatentsTable = ({
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['get-patents'] });
+      queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
     },
   });
 
@@ -80,6 +81,7 @@ const PatentsTable = ({
         setProcessIdToDelete(null);
 
         queryClient.invalidateQueries({ queryKey: ['get-patents'] });
+        queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
       },
       onError: (errorMessage: string) => toast.error(errorMessage),
     });

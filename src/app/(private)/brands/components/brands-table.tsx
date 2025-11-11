@@ -65,6 +65,7 @@ const BrandsTable = ({
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['get-brands'] });
+      queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
     },
   });
 
@@ -80,6 +81,7 @@ const BrandsTable = ({
         setProcessIdToDelete(null);
 
         queryClient.invalidateQueries({ queryKey: ['get-brands'] });
+        queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
       },
       onError: (errorMessage: string) => toast.error(errorMessage),
     });
