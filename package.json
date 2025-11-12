@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
+    "dev": "env-cmd -f environments/.env.development next dev --turbo",
+    "production": "env-cmd -f environments/.env.production next dev --turbo",
+    "build": "env-cmd -f environments/.env.production next build",
+    "start": "env-cmd -f environments/.env.production next start",
     "lint": "next lint",
     "format": "prettier --write ."
   },
@@ -47,6 +48,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "env-cmd": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "prettier": "^3.6.2",
