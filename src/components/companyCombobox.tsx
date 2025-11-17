@@ -21,11 +21,12 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { getCompanies } from '@/services/Companies';
 import { getSelectedCompany } from '@/utils/get-company-by-local-storage';
+import { getCookie } from '@/utils/cookies';
 
 export function CompanyCombobox() {
-  const companyByLocalStorage = getSelectedCompany();
+  const companyByCookies = getSelectedCompany();
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState(companyByLocalStorage?.id || []);
+  const [value, setValue] = React.useState(companyByCookies?.id || []);
 
   const { data: companiesResult, isFetching: isLoadingCompanies } = useQuery({
     queryKey: ['get-companies'],
@@ -35,13 +36,13 @@ export function CompanyCombobox() {
   const companies = React.useMemo(() => {
     if (!companiesResult) return [];
 
-    setValue(companyByLocalStorage?.id || '');
+    setValue(companyByCookies?.id || '');
 
     return companiesResult.data.map((company) => ({
       value: company.id,
       label: company.name,
     }));
-  }, [companiesResult, localStorage.getItem('companies')]);
+  }, [companiesResult, getCookie('companies')]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

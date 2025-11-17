@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getMe, login } from '@/services/AuthService';
 import { getCompanies } from '@/services/Companies';
 import { toast } from 'sonner';
+import { setCookie, removeCookie, getCookie } from '@/utils/cookies';
 
 interface AuthContextType {
   user: User.Entity | null;
@@ -22,7 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = getCookie('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -36,7 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (signInResult?.data) {
       const token = signInResult.data.access_token;
 
-      localStorage.setItem('token', token);
+      setCookie('token', token, 7); // 7 dias
     }
 
     const userResult = await getMe();
@@ -44,7 +45,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (userResult?.data) {
       const user = userResult.data;
 
-      localStorage.setItem('user', JSON.stringify(user));
+      setCookie('user', JSON.stringify(user), 7); // 7 dias
       setUser(user);
     }
 
@@ -53,7 +54,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (companiesResult?.data && companiesResult?.data.length > 0) {
       const firstCompany = companiesResult.data[0];
 
-      localStorage.setItem('company', JSON.stringify(firstCompany));
+      setCookie('company', JSON.stringify(firstCompany), 7); // 7 dias
       router.push('/brands');
     }
   };
@@ -67,14 +68,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       };
 
       setUser(userUpdated);
-      localStorage.setItem('user', JSON.stringify(userUpdated));
+      setCookie('user', JSON.stringify(userUpdated), 7); // 7 dias
     }
   };
 
   const signOut = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('company');
+    removeCookie('token');
+    removeCookie('user');
+    removeCookie('company');
     setUser(null);
     router.push('/sign-in');
   };
