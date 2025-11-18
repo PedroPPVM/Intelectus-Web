@@ -86,29 +86,33 @@ export function NotificationsModal({
 
   const getAlertTypeLabel = (type: string) => {
     const types: Record<string, string> = {
-      info: 'Informação',
-      warning: 'Aviso',
-      error: 'Erro',
-      success: 'Sucesso',
+      mudanca_status: 'Mudança de Status',
+      publicacao: 'Publicação',
+      prazo: 'Prazo',
+      processo_similar: 'Processo Similar',
+      renovacao_vencimento: 'Renovação de Vencimento',
     };
     return types[type] || type;
   };
 
   const getAlertTypeColor = (type: string) => {
     const colors: Record<string, string> = {
-      info: 'text-blue-600 bg-blue-50 dark:bg-blue-950 dark:text-blue-400',
-      warning:
+      mudanca_status:
+        'text-blue-600 bg-blue-50 dark:bg-blue-950 dark:text-blue-400',
+      publicacao:
         'text-yellow-600 bg-yellow-50 dark:bg-yellow-950 dark:text-yellow-400',
-      error: 'text-red-600 bg-red-50 dark:bg-red-950 dark:text-red-400',
-      success:
+      prazo: 'text-red-600 bg-red-50 dark:bg-red-950 dark:text-red-400',
+      processo_similar:
         'text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-400',
+      renovacao_vencimento:
+        'text-purple-600 bg-purple-50 dark:bg-purple-950 dark:text-purple-400',
     };
     return colors[type] || 'text-gray-600 bg-gray-50 dark:bg-gray-950';
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+      <DialogContent className="flex max-h-[80vh] max-w-2xl flex-col">
         <DialogHeader>
           <DialogTitle>Notificações</DialogTitle>
           <DialogDescription>
@@ -116,82 +120,95 @@ export function NotificationsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+        <div className="flex-1 space-y-3 overflow-y-auto pr-2">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div className="border-primary h-8 w-8 animate-spin rounded-full border-b-2"></div>
             </div>
           ) : visibleAlerts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-              <CheckCircle2 className="h-12 w-12 mb-3" />
+            <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
+              <CheckCircle2 className="mb-3 h-12 w-12" />
               <p>Nenhuma notificação no momento</p>
             </div>
           ) : (
-            visibleAlerts.map((alert) => (
-              <div
-                key={alert.id}
-                className={`border rounded-lg p-4 space-y-3 transition-all ${
-                  alert.is_read
-                    ? 'bg-background'
-                    : 'bg-accent border-primary/30'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-sm">{alert.title}</h3>
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${getAlertTypeColor(alert.alert_type)}`}
-                      >
-                        {getAlertTypeLabel(alert.alert_type)}
-                      </span>
-                      {!alert.is_read && (
-                        <span className="flex items-center gap-1 text-xs text-primary">
-                          <span className="h-2 w-2 rounded-full bg-primary animate-pulse"></span>
-                          Não lido
+            visibleAlerts.map((alert) => {
+              const message = alert.message
+                .replace('BRAND', 'Marca')
+                .replace('PATENT', 'Patente')
+                .replace('DESIGN', 'Desenho Industrial')
+                .replace('SOFTWARE', 'Programa de Computador');
+              const messages = message.split('\n');
+
+              return (
+                <div
+                  key={alert.id}
+                  className={`space-y-3 rounded-lg border p-4 transition-all ${
+                    alert.is_read
+                      ? 'bg-background'
+                      : 'bg-muted border-primary/50'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-sm font-semibold">{alert.title}</h3>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs ${getAlertTypeColor(alert.alert_type)}`}
+                        >
+                          {getAlertTypeLabel(alert.alert_type)}
                         </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {alert.message}
-                    </p>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {formatDate(alert.created_at)}
+                        {!alert.is_read && (
+                          <span className="text-primary flex items-center gap-1 text-xs">
+                            <span className="bg-primary h-2 w-2 animate-pulse rounded-full"></span>
+                            Não lido
+                          </span>
+                        )}
+                      </div>
+                      {messages.map((message) => (
+                        <p
+                          key={message}
+                          className="text-muted-foreground text-sm"
+                        >
+                          {message}
+                        </p>
+                      ))}
+                      <div className="text-muted-foreground flex items-center gap-1 text-xs">
+                        <Clock className="h-3 w-3" />
+                        {formatDate(alert.created_at)}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <Separator />
+                  <Separator />
 
-                <div className="flex items-center justify-end gap-2">
-                  {!alert.is_read && (
+                  <div className="flex items-center justify-end gap-2">
+                    {!alert.is_read && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => markAsRead(alert.id)}
+                        className="gap-2"
+                      >
+                        <Check className="h-3 w-3" />
+                        Marcar como lido
+                      </Button>
+                    )}
                     <Button
-                      variant="outline"
+                      variant="destructive"
                       size="sm"
-                      onClick={() => markAsRead(alert.id)}
+                      onClick={() => dismissAlert(alert.id)}
                       className="gap-2"
                     >
-                      <Check className="h-3 w-3" />
-                      Marcar como lido
+                      <X className="h-3 w-3" />
+                      Descartar
                     </Button>
-                  )}
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => dismissAlert(alert.id)}
-                    className="gap-2"
-                  >
-                    <X className="h-3 w-3" />
-                    Descartar
-                  </Button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </DialogContent>
     </Dialog>
   );
 }
-
