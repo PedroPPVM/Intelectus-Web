@@ -16,7 +16,7 @@ import {
 } from '@/services/Alerts';
 import { Check, X, Clock, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Separator } from '@/components/ui/separator';
 
 interface NotificationsModalProps {
@@ -68,10 +68,22 @@ export function NotificationsModal({
     },
   });
 
-  const alerts = alertsResponse?.data ?? [];
-  const visibleAlerts = alerts.filter(
-    (alert) => !alert.is_dismissed && !dismissedAlerts.has(alert.id),
-  );
+  const visibleAlerts = useMemo(() => {
+    const alerts = alertsResponse?.data ?? [];
+
+    const filteredAlerts = alerts.filter(
+      (alert) => !alert.is_dismissed && !dismissedAlerts.has(alert.id),
+    );
+
+    const sortedAlerts = filteredAlerts.sort((left, right) => {
+      return (
+        new Date(right.created_at).getTime() -
+        new Date(left.created_at).getTime()
+      );
+    });
+
+    return sortedAlerts.slice(0, 10);
+  }, [alertsResponse, dismissedAlerts]);
 
   const formatDate = (date: Date) => {
     const d = new Date(date);
@@ -120,7 +132,7 @@ export function NotificationsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 space-y-3 overflow-y-auto pr-2">
+        <div className="flex-1 space-y-3 overflow-y-auto pr-2 pb-1">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="border-primary h-8 w-8 animate-spin rounded-full border-b-2"></div>
@@ -137,7 +149,12 @@ export function NotificationsModal({
                 .replace('PATENT', 'Patente')
                 .replace('DESIGN', 'Desenho Industrial')
                 .replace('SOFTWARE', 'Programa de Computador');
+
               const messages = message.split('\n');
+
+              const filteredMessages = messages.filter(
+                (message) => !message.includes('Revista RPI'),
+              );
 
               return (
                 <div
@@ -164,7 +181,7 @@ export function NotificationsModal({
                           </span>
                         )}
                       </div>
-                      {messages.map((message) => (
+                      {filteredMessages.map((message) => (
                         <p
                           key={message}
                           className="text-muted-foreground text-sm"

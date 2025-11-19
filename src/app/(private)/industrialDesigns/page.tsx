@@ -54,7 +54,11 @@ const IndustrialDesigns = () => {
   }, [industrialDesignsResult]);
 
   const filteredIndustrialDesigns = useMemo(() => {
-    return industrialDesigns.filter((industrialDesign) => industrialDesign.process_number.toLowerCase().includes(search.toLowerCase()));
+    return industrialDesigns.filter((industrialDesign) =>
+      industrialDesign.process_number
+        .toLowerCase()
+        .includes(search.toLowerCase()),
+    );
   }, [industrialDesigns, search]);
 
   const {
@@ -112,23 +116,25 @@ const IndustrialDesigns = () => {
     onError: (errorMessage: string) => toast.error(errorMessage),
   });
 
-  const { mutateAsync: onUpdateFromMagazines, isPending: isUpdatingFromMagazines } =
-    useMutation({
-      mutationKey: ['update-industrial-designs-from-magazines'],
-      mutationFn: async () =>
-        updateProcessesFromMagazines({
-          companyId: companyByLocalStorage?.id || '',
-          processType: 'DESIGN',
-        }),
-      onSuccess: (response) => {
-        onRefetchIndustrialDesigns();
-        queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
-        toast.success(
-          `Atualização concluída! ${response.data.updated_processes} de ${response.data.total_processes} processos atualizados.`,
-        );
-      },
-      onError: (errorMessage: string) => toast.error(errorMessage),
-    });
+  const {
+    mutateAsync: onUpdateFromMagazines,
+    isPending: isUpdatingFromMagazines,
+  } = useMutation({
+    mutationKey: ['update-industrial-designs-from-magazines'],
+    mutationFn: async () =>
+      updateProcessesFromMagazines({
+        companyId: companyByLocalStorage?.id || '',
+        processType: 'DESIGN',
+      }),
+    onSuccess: (response) => {
+      onRefetchIndustrialDesigns();
+      queryClient.invalidateQueries({ queryKey: ['alerts', 'unread-count'] });
+      toast.success(
+        `Atualização concluída! ${response.data.updated_processes} de ${response.data.total_processes} processos atualizados.`,
+      );
+    },
+    onError: (errorMessage: string) => toast.error(errorMessage),
+  });
 
   const handleOpenProcessModal = (process: Process.Entity) => {
     setManageProcessMode('edit');
@@ -153,25 +159,25 @@ const IndustrialDesigns = () => {
         <span className="text-2xl font-bold">Desenhos Industriais</span>
 
         <div className="flex gap-4">
-          <div 
-            className="flex gap-2 w-full min-w-[310px] h-9 max-w-sm rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          <div className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full max-w-sm min-w-[310px] gap-2 rounded-md border px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50">
             <SearchIcon className="size-4" />
             <input
               type="text"
-              className='w-full border-none outline-none'
+              className="w-full border-none outline-none"
               placeholder="Buscar desenho pelo número do processo"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          
+
           <div className="flex items-center gap-4">
             <Button
               onClick={() => onUpdateFromMagazines()}
               disabled={isUpdatingFromMagazines}
             >
-              <RefreshCw className={isUpdatingFromMagazines ? 'animate-spin' : ''} />
+              <RefreshCw
+                className={isUpdatingFromMagazines ? 'animate-spin' : ''}
+              />
               {isUpdatingFromMagazines ? 'Atualizando...' : 'Atualizar Todos'}
             </Button>
 
@@ -186,7 +192,6 @@ const IndustrialDesigns = () => {
             </Button>
           </div>
         </div>
-        
       </CardHeader>
 
       <CardContent>
@@ -223,6 +228,7 @@ const IndustrialDesigns = () => {
               }
             : undefined
         }
+        isLoading={isCreatingProcess || isUpdatingProcess}
       />
     </Card>
   );

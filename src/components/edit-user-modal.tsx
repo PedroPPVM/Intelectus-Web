@@ -134,9 +134,13 @@ export function EditUserModal({
             <AlertDialogAction
               type="submit"
               disabled={isUpdatingUser || !isDirty}
+              className="w-[140px]"
             >
-              {isUpdatingUser && <Loader2 className="h-4 w-4 animate-spin" />}
-              Salvar Alterações
+              {isUpdatingUser ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                'Salvar Alterações'
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </form>

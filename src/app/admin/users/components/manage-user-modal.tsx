@@ -306,12 +306,8 @@ export function ManageUserModal({
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading
-                ? 'Salvando...'
-                : mode === 'edit'
-                  ? 'Salvar Alterações'
-                  : 'Criar Usuário'}
+            <Button type="submit" isLoading={isLoading}>
+              {mode === 'edit' ? 'Salvar Alterações' : 'Criar Usuário'}
             </Button>
           </DialogFooter>
         </form>

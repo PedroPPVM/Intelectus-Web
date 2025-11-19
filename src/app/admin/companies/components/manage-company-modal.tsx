@@ -307,12 +307,8 @@ export function ManageCompanyModal({
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading
-                ? 'Salvando...'
-                : mode === 'edit'
-                  ? 'Salvar Alterações'
-                  : 'Criar Empresa'}
+            <Button type="submit" isLoading={isLoading}>
+              {mode === 'edit' ? 'Salvar Alterações' : 'Criar Empresa'}
             </Button>
           </DialogFooter>
         </form>

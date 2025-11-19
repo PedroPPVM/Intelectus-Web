@@ -240,6 +240,7 @@ const BrandsTable = ({
         open={isOpenDeleteConfirmModal}
         onOpenChange={() => setIsOpenDeleteConfirmModal(false)}
         onConfirm={handleDeleteProcess}
+        isLoading={isDeletingProcess}
       />
     </div>
   );

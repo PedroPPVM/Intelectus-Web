@@ -93,12 +93,9 @@ export default function SignIn() {
               type="submit"
               disabled={isLoadingSignIn}
               className="disabled:bg-gray-400"
+              isLoading={isLoadingSignIn}
             >
-              {isLoadingSignIn && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-
-              <span>Entrar</span>
+              Entrar
             </Button>
           </form>
         </CardContent>

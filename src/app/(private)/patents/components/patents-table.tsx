@@ -246,6 +246,7 @@ const PatentsTable = ({
         open={isOpenDeleteConfirmModal}
         onOpenChange={() => setIsOpenDeleteConfirmModal(false)}
         onConfirm={handleDeleteProcess}
+        isLoading={isDeletingProcess}
       />
     </div>
   );

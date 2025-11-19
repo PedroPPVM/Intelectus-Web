@@ -220,6 +220,7 @@ const Patents = () => {
               }
             : undefined
         }
+        isLoading={isCreatingProcess || isUpdatingProcess}
       />
     </Card>
   );

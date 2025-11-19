@@ -78,6 +78,7 @@ interface ManageProcessModalProps {
   initialData?: ProcessProps;
   onSave: (data: ProcessProps) => void;
   mode?: 'create' | 'edit';
+  isLoading?: boolean;
 }
 
 export function ManageProcessModal({
@@ -86,6 +87,7 @@ export function ManageProcessModal({
   initialData,
   onSave,
   mode = 'create',
+  isLoading = false,
 }: ManageProcessModalProps) {
   const [deposit_dateOpen, setDepositDateOpen] = useState(false);
   const [concession_dateOpen, setConcessionDateOpen] = useState(false);
@@ -306,10 +308,11 @@ export function ManageProcessModal({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={isLoading}
             >
               Cancelar
             </Button>
-            <Button type="submit">
+            <Button type="submit" isLoading={isLoading}>
               {mode === 'edit' ? 'Salvar Alterações' : 'Criar Processo'}
             </Button>
           </DialogFooter>

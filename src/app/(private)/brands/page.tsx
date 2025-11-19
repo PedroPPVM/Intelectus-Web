@@ -221,6 +221,7 @@ const Brands = () => {
               }
             : undefined
         }
+        isLoading={isCreatingProcess || isUpdatingProcess}
       />
     </Card>
   );
