@@ -171,6 +171,12 @@ const ComputerProgramsTable = ({
               onSort={onSort}
             />
             <SortableTableHeader
+              column="magazine_publication_date"
+              label="Data RPI"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <SortableTableHeader
               column="depositor"
               label="Depositante"
               sorting={sorting}
@@ -202,7 +208,7 @@ const ComputerProgramsTable = ({
         <TableBody>
           {computerPrograms.length === 0 && (
             <TableRow>
-              <TableCell colSpan={9} className="py-4 text-center">
+              <TableCell colSpan={10} className="py-4 text-center">
                 Nenhuma programa de computador encontrado.
               </TableCell>
             </TableRow>
@@ -223,6 +229,10 @@ const ComputerProgramsTable = ({
                 {computerProgram.status}
               </TableCell>
               <TableCell className="border-r py-4">
+                {computerProgram.magazine_publication_date &&
+                  dayjs(computerProgram.magazine_publication_date).format('DD/MM/YYYY')}
+              </TableCell>
+              <TableCell className="border-r py-4">
                 {computerProgram.depositor}
               </TableCell>
               <TableCell className="border-r py-4">
@@ -233,13 +243,16 @@ const ComputerProgramsTable = ({
                 {computerProgram.attorney}
               </TableCell>
               <TableCell className="border-r py-4">
-                {dayjs(computerProgram.deposit_date).format('DD/MM/YYYY')}
+                {computerProgram.deposit_date &&
+                  dayjs(computerProgram.deposit_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="border-r py-4">
-                {dayjs(computerProgram.concession_date).format('DD/MM/YYYY')}
+                {computerProgram.concession_date &&
+                  dayjs(computerProgram.concession_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="border-r py-4">
-                {dayjs(computerProgram.validity_date).format('DD/MM/YYYY')}
+                {computerProgram.validity_date &&
+                  dayjs(computerProgram.validity_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="w-[50px] py-4">
                 {actionsOptions(computerProgram)}

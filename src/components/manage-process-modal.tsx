@@ -20,57 +20,47 @@ export interface ProcessProps {
   id?: string;
   process_number: string;
   title: string;
-  status: string;
-  depositor: string;
-  cnpj_depositor: string;
-  cpf_depositor: string;
-  attorney: string;
-  deposit_date: Date;
-  concession_date: Date;
-  validity_date: Date;
+  status?: string;
+  depositor?: string;
+  cnpj_depositor?: string | null;
+  cpf_depositor?: string | null;
+  attorney?: string;
+  deposit_date?: Date;
+  concession_date?: Date;
+  validity_date?: Date;
 }
 
-const processSchema = z
-  .object({
-    process_number: z.string().min(5, 'Informe um número de processo com no mínimo 5 caracteres.').trim(),
-    title: z.string().min(1, 'Informe o nome da marca.').trim(),
-    status: z.string().min(1, 'Informe o status da marca.').trim(),
-    depositor: z.string().min(1, 'Informe o depositante.').trim(),
-    cnpj_depositor: z
-      .string()
-      .optional()
-      .refine((val) => !val || val.length >= 14, {
-        message: 'CNPJ Inválido.',
-      }),
-    cpf_depositor: z
-      .string()
-      .optional()
-      .refine((val) => !val || val.length >= 11, {
-        message: 'CPF Inválido.',
-      }),
-    attorney: z.string().min(1, 'Informe o procurador.').trim(),
-    deposit_date: z.string().min(1, 'Informe a data do depósito.'),
-    concession_date: z.string().min(1, 'Informe a data da concessão.'),
-    validity_date: z.string().min(1, 'Informe a vigência.'),
-  })
-  .refine((data) => data.cpf_depositor || data.cnpj_depositor, {
-    message: 'CNPJ ou CPF deve ser preenchido.',
-    path: ['cnpj_depositor'],
-  });
+const processSchema = z.object({
+  id: z.string().optional(),
+  process_number: z
+    .string()
+    .min(5, 'Informe um número de processo com no mínimo 5 caracteres.')
+    .trim(),
+  title: z
+    .string()
+    .min(5, 'Informe o nome da marca com no mínimo 5 caracteres.')
+    .trim(),
+  status: z.string().optional(),
+  depositor: z.string().optional(),
+  cnpj_depositor: z
+    .string()
+    .nullish()
+    .refine((val) => !val || val.length >= 14, {
+      message: 'CNPJ Inválido.',
+    }),
+  cpf_depositor: z
+    .string()
+    .nullish()
+    .refine((val) => !val || val.length >= 11, {
+      message: 'CPF Inválido.',
+    }),
+  attorney: z.string().optional(),
+  deposit_date: z.string().optional(),
+  concession_date: z.string().optional(),
+  validity_date: z.string().optional(),
+});
 
-type ProcessFormSchema = {
-  id?: string;
-  process_number: string;
-  title: string;
-  status: string;
-  depositor: string;
-  cnpj_depositor?: string;
-  cpf_depositor?: string;
-  attorney: string;
-  deposit_date: string;
-  concession_date: string;
-  validity_date: string;
-};
+type ProcessFormSchema = z.infer<typeof processSchema>;
 
 interface ManageProcessModalProps {
   open: boolean;
@@ -106,21 +96,21 @@ export function ManageProcessModal({
     defaultValues: {
       id: initialData?.id ?? '',
       process_number: initialData?.process_number ?? '',
-      title: initialData?.title ?? '',
-      status: initialData?.status ?? '',
-      depositor: initialData?.depositor ?? '',
-      cnpj_depositor: initialData?.cnpj_depositor ?? '',
-      cpf_depositor: initialData?.cpf_depositor ?? '',
-      attorney: initialData?.attorney ?? '',
+      title: initialData?.title,
+      status: initialData?.status,
+      depositor: initialData?.depositor,
+      cnpj_depositor: initialData?.cnpj_depositor,
+      cpf_depositor: initialData?.cpf_depositor,
+      attorney: initialData?.attorney,
       deposit_date: initialData?.deposit_date
         ? dayjs(initialData.deposit_date).format('YYYY-MM-DD')
-        : '',
+        : undefined,
       concession_date: initialData?.concession_date
         ? dayjs(initialData.concession_date).format('YYYY-MM-DD')
-        : '',
+        : undefined,
       validity_date: initialData?.validity_date
         ? dayjs(initialData.validity_date).format('YYYY-MM-DD')
-        : '',
+        : undefined,
     },
   });
 
@@ -130,20 +120,20 @@ export function ManageProcessModal({
         id: initialData?.id ?? '',
         process_number: initialData?.process_number ?? '',
         title: initialData?.title ?? '',
-        status: initialData?.status ?? '',
-        depositor: initialData?.depositor ?? '',
-        cnpj_depositor: initialData?.cnpj_depositor ?? '',
-        cpf_depositor: initialData?.cpf_depositor ?? '',
-        attorney: initialData?.attorney ?? '',
+        status: initialData?.status,
+        depositor: initialData?.depositor,
+        cnpj_depositor: initialData?.cnpj_depositor,
+        cpf_depositor: initialData?.cpf_depositor,
+        attorney: initialData?.attorney,
         deposit_date: initialData?.deposit_date
           ? dayjs(initialData.deposit_date).format('YYYY-MM-DD')
-          : '',
+          : undefined,
         concession_date: initialData?.concession_date
           ? dayjs(initialData.concession_date).format('YYYY-MM-DD')
-          : '',
+          : undefined,
         validity_date: initialData?.validity_date
           ? dayjs(initialData.validity_date).format('YYYY-MM-DD')
-          : '',
+          : undefined,
       });
     }
   }, [open]);
@@ -155,12 +145,16 @@ export function ManageProcessModal({
       title: data.title,
       status: data.status,
       depositor: data.depositor,
-      cnpj_depositor: data.cnpj_depositor || '',
-      cpf_depositor: data.cpf_depositor || '',
+      cnpj_depositor: data.cnpj_depositor,
+      cpf_depositor: data.cpf_depositor,
       attorney: data.attorney,
-      deposit_date: new Date(data.deposit_date),
-      concession_date: new Date(data.concession_date),
-      validity_date: new Date(data.validity_date),
+      deposit_date: data.deposit_date ? new Date(data.deposit_date) : undefined,
+      concession_date: data.concession_date
+        ? new Date(data.concession_date)
+        : undefined,
+      validity_date: data.validity_date
+        ? new Date(data.validity_date)
+        : undefined,
     });
   }
 
@@ -200,15 +194,19 @@ export function ManageProcessModal({
                 </span>
               )}
             </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">Situação</label>
-              <Input {...register('status')} />
-              {errors.status && (
-                <span className="text-xs text-red-500">
-                  {errors.status.message}
-                </span>
-              )}
-            </div>
+            {mode === 'create' && (
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  Situação
+                </label>
+                <Input {...register('status')} />
+                {errors.status && (
+                  <span className="text-xs text-red-500">
+                    {errors.status.message}
+                  </span>
+                )}
+              </div>
+            )}
             <div>
               <label className="mb-1 block text-sm font-medium">
                 Depositante
@@ -229,7 +227,7 @@ export function ManageProcessModal({
 
                   <IMaskInput
                     mask="00.000.000/0000-00"
-                    value={field.value}
+                    value={field.value || undefined}
                     onAccept={(value: string) => field.onChange(value)}
                     unmask
                     className="dark:bg-input/30 border-input focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
@@ -252,7 +250,7 @@ export function ManageProcessModal({
 
                   <IMaskInput
                     mask="000.000.000-00"
-                    value={field.value}
+                    value={field.value || undefined}
                     onAccept={(value: string) => field.onChange(value)}
                     unmask
                     className="dark:bg-input/30 border-input focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
@@ -278,7 +276,7 @@ export function ManageProcessModal({
               )}
             </div>
             <DatePickerField
-              value={watch('deposit_date')}
+              value={watch('deposit_date') ?? ''}
               setValue={(value) => setValue('deposit_date', value)}
               label="Data do Depósito"
               isOpen={deposit_dateOpen}
@@ -286,7 +284,7 @@ export function ManageProcessModal({
               error={errors.deposit_date?.message}
             />
             <DatePickerField
-              value={watch('concession_date')}
+              value={watch('concession_date') ?? ''}
               setValue={(value) => setValue('concession_date', value)}
               label="Data da Concessão"
               isOpen={concession_dateOpen}
@@ -294,7 +292,7 @@ export function ManageProcessModal({
               error={errors.concession_date?.message}
             />
             <DatePickerField
-              value={watch('validity_date')}
+              value={watch('validity_date') ?? ''}
               setValue={(value) => setValue('validity_date', value)}
               label="Vigência"
               isOpen={validity_dateOpen}

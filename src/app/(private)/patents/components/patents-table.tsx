@@ -171,6 +171,12 @@ const PatentsTable = ({
               onSort={onSort}
             />
             <SortableTableHeader
+              column="magazine_publication_date"
+              label="Data RPI"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <SortableTableHeader
               column="depositor"
               label="Depositante"
               sorting={sorting}
@@ -202,7 +208,7 @@ const PatentsTable = ({
         <TableBody>
           {patents.length === 0 && (
             <TableRow>
-              <TableCell colSpan={9} className="py-4 text-center">
+              <TableCell colSpan={10} className="py-4 text-center">
                 Nenhuma patente encontrada.
               </TableCell>
             </TableRow>
@@ -219,6 +225,10 @@ const PatentsTable = ({
               </TableCell>
               <TableCell className="border-r py-4">{patent.status}</TableCell>
               <TableCell className="border-r py-4">
+                {patent.magazine_publication_date &&
+                  dayjs(patent.magazine_publication_date).format('DD/MM/YYYY')}
+              </TableCell>
+              <TableCell className="border-r py-4">
                 {patent.depositor}
               </TableCell>
               <TableCell className="border-r py-4">
@@ -226,13 +236,16 @@ const PatentsTable = ({
               </TableCell>
               <TableCell className="border-r py-4">{patent.attorney}</TableCell>
               <TableCell className="border-r py-4">
-                {dayjs(patent.deposit_date).format('DD/MM/YYYY')}
+                {patent.deposit_date &&
+                  dayjs(patent.deposit_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="border-r py-4">
-                {dayjs(patent.concession_date).format('DD/MM/YYYY')}
+                {patent.concession_date &&
+                  dayjs(patent.concession_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="border-r py-4">
-                {dayjs(patent.validity_date).format('DD/MM/YYYY')}
+                {patent.validity_date &&
+                  dayjs(patent.validity_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="w-[50px] py-4">
                 {actionsOptions(patent)}

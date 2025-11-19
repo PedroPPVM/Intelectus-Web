@@ -11,6 +11,7 @@ namespace Process {
     deposit_date: Date;
     concession_date: Date;
     validity_date: Date;
+    magazine_publication_date: Date;
     company_id: string;
     process_type: string;
   }

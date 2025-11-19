@@ -170,6 +170,12 @@ const BrandsTable = ({
               onSort={onSort}
             />
             <SortableTableHeader
+              column="magazine_publication_date"
+              label="Data RPI"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <SortableTableHeader
               column="depositor"
               label="Depositante"
               sorting={sorting}
@@ -201,7 +207,7 @@ const BrandsTable = ({
         <TableBody>
           {brands.length === 0 && (
             <TableRow>
-              <TableCell colSpan={9} className="py-4 text-center">
+              <TableCell colSpan={10} className="py-4 text-center">
                 Nenhuma marca encontrada
               </TableCell>
             </TableRow>
@@ -214,19 +220,26 @@ const BrandsTable = ({
               </TableCell>
               <TableCell className="border-r py-4">{brand.title}</TableCell>
               <TableCell className="border-r py-4">{brand.status}</TableCell>
+              <TableCell className="border-r py-4">
+                {brand.magazine_publication_date &&
+                  dayjs(brand.magazine_publication_date).format('DD/MM/YYYY')}
+              </TableCell>
               <TableCell className="border-r py-4">{brand.depositor}</TableCell>
               <TableCell className="border-r py-4">
                 {brand.cnpj_depositor || brand.cpf_depositor}
               </TableCell>
               <TableCell className="border-r py-4">{brand.attorney}</TableCell>
               <TableCell className="border-r py-4">
-                {dayjs(brand.deposit_date).format('DD/MM/YYYY')}
+                {brand.deposit_date &&
+                  dayjs(brand.deposit_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="border-r py-4">
-                {dayjs(brand.concession_date).format('DD/MM/YYYY')}
+                {brand.concession_date &&
+                  dayjs(brand.concession_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="border-r py-4">
-                {dayjs(brand.validity_date).format('DD/MM/YYYY')}
+                {brand.validity_date &&
+                  dayjs(brand.validity_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="w-[50px] py-4">
                 {actionsOptions(brand)}

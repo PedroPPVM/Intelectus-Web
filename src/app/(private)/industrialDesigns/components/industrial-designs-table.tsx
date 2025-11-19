@@ -171,6 +171,12 @@ const IndustrialDesignsTable = ({
               onSort={onSort}
             />
             <SortableTableHeader
+              column="magazine_publication_date"
+              label="Data RPI"
+              sorting={sorting}
+              onSort={onSort}
+            />
+            <SortableTableHeader
               column="depositor"
               label="Depositante"
               sorting={sorting}
@@ -202,7 +208,7 @@ const IndustrialDesignsTable = ({
         <TableBody>
           {industrialDesigns.length === 0 && (
             <TableRow>
-              <TableCell colSpan={9} className="py-4 text-center">
+              <TableCell colSpan={10} className="py-4 text-center">
                 Nenhuma desenho industrial encontrado.
               </TableCell>
             </TableRow>
@@ -223,6 +229,10 @@ const IndustrialDesignsTable = ({
                 {industrialDesign.status}
               </TableCell>
               <TableCell className="border-r py-4">
+                {industrialDesign.magazine_publication_date &&
+                  dayjs(industrialDesign.magazine_publication_date).format('DD/MM/YYYY')}
+              </TableCell>
+              <TableCell className="border-r py-4">
                 {industrialDesign.depositor}
               </TableCell>
               <TableCell className="border-r py-4">
@@ -233,13 +243,16 @@ const IndustrialDesignsTable = ({
                 {industrialDesign.attorney}
               </TableCell>
               <TableCell className="border-r py-4">
-                {dayjs(industrialDesign.deposit_date).format('DD/MM/YYYY')}
+                {industrialDesign.deposit_date &&
+                  dayjs(industrialDesign.deposit_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="border-r py-4">
-                {dayjs(industrialDesign.concession_date).format('DD/MM/YYYY')}
+                {industrialDesign.concession_date &&
+                  dayjs(industrialDesign.concession_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="border-r py-4">
-                {dayjs(industrialDesign.validity_date).format('DD/MM/YYYY')}
+                {industrialDesign.validity_date &&
+                  dayjs(industrialDesign.validity_date).format('DD/MM/YYYY')}
               </TableCell>
               <TableCell className="w-[50px] py-4">
                 {actionsOptions(industrialDesign)}
