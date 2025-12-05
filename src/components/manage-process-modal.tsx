@@ -14,7 +14,10 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DatePickerField } from './date-picker-field';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { IMaskInput } from 'react-imask';
+
+dayjs.extend(customParseFormat);
 
 export interface ProcessProps {
   id?: string;
@@ -55,9 +58,42 @@ const processSchema = z.object({
       message: 'CPF Inválido.',
     }),
   attorney: z.string().optional(),
-  deposit_date: z.string().optional(),
-  concession_date: z.string().optional(),
-  validity_date: z.string().optional(),
+  deposit_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        return dayjs(val, 'YYYY-MM-DD', true).isValid();
+      },
+      {
+        message: 'Data inválida',
+      },
+    ),
+  concession_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        return dayjs(val, 'YYYY-MM-DD', true).isValid();
+      },
+      {
+        message: 'Data inválida',
+      },
+    ),
+  validity_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        return dayjs(val, 'YYYY-MM-DD', true).isValid();
+      },
+      {
+        message: 'Data inválida',
+      },
+    ),
 });
 
 type ProcessFormSchema = z.infer<typeof processSchema>;
@@ -275,29 +311,47 @@ export function ManageProcessModal({
                 </span>
               )}
             </div>
-            <DatePickerField
-              value={watch('deposit_date') ?? ''}
-              setValue={(value) => setValue('deposit_date', value)}
-              label="Data do Depósito"
-              isOpen={deposit_dateOpen}
-              setIsOpen={setDepositDateOpen}
-              error={errors.deposit_date?.message}
+            <Controller
+              control={control}
+              name="deposit_date"
+              render={({ field }) => (
+                <DatePickerField
+                  value={field.value ?? ''}
+                  setValue={field.onChange}
+                  label="Data do Depósito"
+                  isOpen={deposit_dateOpen}
+                  setIsOpen={setDepositDateOpen}
+                  error={errors.deposit_date?.message}
+                />
+              )}
             />
-            <DatePickerField
-              value={watch('concession_date') ?? ''}
-              setValue={(value) => setValue('concession_date', value)}
-              label="Data da Concessão"
-              isOpen={concession_dateOpen}
-              setIsOpen={setConcessionDateOpen}
-              error={errors.concession_date?.message}
+            <Controller
+              control={control}
+              name="concession_date"
+              render={({ field }) => (
+                <DatePickerField
+                  value={field.value ?? ''}
+                  setValue={field.onChange}
+                  label="Data da Concessão"
+                  isOpen={concession_dateOpen}
+                  setIsOpen={setConcessionDateOpen}
+                  error={errors.concession_date?.message}
+                />
+              )}
             />
-            <DatePickerField
-              value={watch('validity_date') ?? ''}
-              setValue={(value) => setValue('validity_date', value)}
-              label="Vigência"
-              isOpen={validity_dateOpen}
-              setIsOpen={setValidityDateOpen}
-              error={errors.validity_date?.message}
+            <Controller
+              control={control}
+              name="validity_date"
+              render={({ field }) => (
+                <DatePickerField
+                  value={field.value ?? ''}
+                  setValue={field.onChange}
+                  label="Vigência"
+                  isOpen={validity_dateOpen}
+                  setIsOpen={setValidityDateOpen}
+                  error={errors.validity_date?.message}
+                />
+              )}
             />
           </div>
 
